@@ -1,0 +1,63 @@
+# ========== OS ==========
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# ========== Editor ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.log
+
+# ========== Node / npm ==========
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========== Python ==========
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# ========== Unity / Game Dev ==========
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Aa]ssets/External/
+*.unitypackage
+
+# ========== OpenClaw ==========
+.openclaw/
+*.session
+*.sqlite
+
+# ========== AI / ML Outputs ==========
+*.png
+*.jpg
+*.jpeg
+*.webp
+generated/
+output/
+*.output
+
+# ========== Secrets ==========
+.env
+.env.local
+.env.*.local
+secrets/
+credentials/
+
+# ========== Misc ==========
+*.bak
+*.tmp
+*.temp
