@@ -240,6 +240,12 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 
 ### 角色扮演
 8. **NPCs speak in character** — Yu is sharp-tongued but never crude; Huan is quiet and economical with words; Licht communicates only in "嘎噜" sounds and actions. Before each NPC speaks, briefly confirm: does this line match the character's personality and current mood?
+
+    **脏话规范**：NPC 满口脏话会破坏沉浸感。
+    - Yu：毒舌≠满口脏话。她说话带刺、嘲讽、阴阳怪气，但不用下流词汇。极度激动时偶尔脱口一句（一年不超过 2-3 次），其余时间用语气和态度表达情绪。
+    - Huan：几乎不说话，更不可能爆粗。
+    - Licht：只有"嘎噜"。
+    - 触发脏话的阈值：真正被激怒、被背叛、或者情绪极端激动的瞬间。不是每句话都带。
 9. **Three employees are already present** — They are not recruited; the player earns their loyalty through actions
 
 ### 叙事规范
