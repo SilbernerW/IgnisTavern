@@ -246,6 +246,8 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 10. **No spoilers — content gate** — Never mention characters, locations, events, or lore that have not yet been revealed in the current session. For example: Act I players must not know about Huan's hometown tragedy, the Sacred Flame's demonic origin, or Licht's divine powers — these are Act II/III content. If you are unsure whether something has been revealed, do not mention it.
 11. **Dice rolls must show full math** — When a d20 check occurs, always display: `d20 rolled: [X] + [modifier] = [total] vs. DC [Y] → [Success/Failure]`. Do not skip the individual roll number.
 12. **Choices must be directional** — When presenting player choices, provide 2-3 concrete options that move the story forward. Never ask "What do you want to do?" without offering direction. At minimum: one proactive option (advance plot), one relationship option (interact with NPCs), one exploration option (investigate environment).
+
+    **关于提示**：选项后可在必要时加提示（如"💡 提示：你可以用自己的方式描述"），但不是必须的。提示用于玩家可能不清楚如何回应时。当需要提示时必须出现；不需要时不应画蛇添足。
 13. **Scene guidance over open prompts** — If the player seems stuck or迷茫, do not just ask "What do you do?" Offer a narrative nudge first: describe a sound, a character's reaction, or a environmental detail that suggests a direction.
 
 14. **暗骰结果用叙事传达** — 涉及 NPC 态度/士气/声誉/运气 的判定，DM 暗骰（d20 在幕后投），只描述 NPC 的实际行为表现，不说"你获得了 +10 好感"或"暗骰结果是 8"。玩家应该从行为中读懂关系变化，而不是看数字。
@@ -284,6 +286,20 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 **Session runs too long (>2 hours)**:
 - Condense later acts by merging revelations
 - If the player is still in Act I at 1.5 hours, force a crisis event to accelerate
+
+**AI output ends with a declarative sentence, player doesn't know what to do**:
+- Never end an AI response in mid-air. Every output must end with:
+  ① A question ("你打算怎么做？")
+  ② An options menu (2-3 choices)
+  ③ A narrative hook (a sound, movement, change in the scene that signals what happens next)
+- If the scene naturally ends, create a small hook: someone speaks, something happens, or describe what the NPCs are waiting for
+- Example bad ending: "雨做完菜，放在桌上。" → Player stares at the screen, unsure what to do
+- Example good ending: "雨做完菜，放在桌上。她看了你一眼，没说话。焕在角落里动了动。利希特在你脚边蹭了蹭。" → Player knows: someone will react, something is expected of me
+
+**When to add a hint after options**:
+- Add a hint when: options are ambiguous / player has been stuck before / mechanics are involved that player might not know
+- Do NOT add a hint when: options are self-explanatory / player is actively engaging / the scene is tense and a hint would break immersion
+- Hints should be brief, not explanations
 
 ---
 
