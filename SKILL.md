@@ -248,6 +248,8 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 12. **Choices must be directional** — When presenting player choices, provide 2-3 concrete options that move the story forward. Never ask "What do you want to do?" without offering direction. At minimum: one proactive option (advance plot), one relationship option (interact with NPCs), one exploration option (investigate environment).
 13. **Scene guidance over open prompts** — If the player seems stuck or迷茫, do not just ask "What do you do?" Offer a narrative nudge first: describe a sound, a character's reaction, or a environmental detail that suggests a direction.
 
+14. **暗骰结果用叙事传达** — 涉及 NPC 态度/士气/声誉/运气 的判定，DM 暗骰（d20 在幕后投），只描述 NPC 的实际行为表现，不说"你获得了 +10 好感"或"暗骰结果是 8"。玩家应该从行为中读懂关系变化，而不是看数字。
+
 ---
 
 ## 📋 Scene File Reference
