@@ -67,7 +67,86 @@ This is a 3-person project running over 1–2 weeks. The goal is a **playable pr
 
 ## Quick Start / 快速开始
 
-> *Coming soon — this section will be updated once the prototype is ready.*
+### 安装 Installation (手动 / Manual)
+
+**前提条件 / Prerequisites**
+
+- 已安装 OpenClaw（[安装指南](https://docs.openclaw.ai/install)）
+- OpenClaw is already installed ([install guide](https://docs.openclaw.ai/install))
+
+**步骤 / Steps**
+
+1. **下载仓库** — 下载 `ignis-tavern` 文件夹，或 clone 整个仓库
+   Download the repository:
+   ```bash
+   git clone https://github.com/Kangruchen/IgnisTavern.git
+   ```
+
+2. **复制到 skills 目录** — 把仓库内容放到 OpenClaw 的 skills 文件夹
+   Copy the repository contents to OpenClaw's skills directory:
+   ```bash
+   # Windows
+   xcopy /E /I IgnisTavern %USERPROFILE%\.openclaw\skills\ignis-tavern
+
+   # macOS / Linux
+   cp -r IgnisTavern ~/.openclaw/skills/ignis-tavern
+   ```
+
+   目录结构应该像这样：
+   The directory structure should look like this:
+   ```
+   ~/.openclaw/skills/ignis-tavern/
+   ├── SKILL.md
+   ├── README.md
+   └── src/
+       ├── prompts/
+       ├── rules/
+       └── scenes/
+   ```
+
+3. **重启 OpenClaw** — 如果 OpenClaw 正在运行，重启 gateway 让新 skill 生效
+   Restart OpenClaw gateway if it's running to load the new skill
+
+4. **开始游戏** — 在 OpenClaw 对话中输入：
+   Start the game by saying in your OpenClaw chat:
+   ```
+   玩伊格尼斯酒馆
+   ```
+   或 / or: `play Ignis Tavern`
+
+   AI 会加载 SKILL.md 并开始游戏。
+   The AI will load SKILL.md and begin the session.
+
+---
+
+### 开始游戏 Starting the Game
+
+游戏开始后，AI 会依次引导你：
+Once started, the AI will guide you through:
+
+1. **选择语言** — 中文 / English
+2. **创建角色** — 预设模板或问答生成
+3. **第一幕** — 经营酒馆，赢得三位员工的信任
+4. **资格确认** — 达成连续3天达标，解锁第一幕结局
+
+Language → Character Creation → Act I Management → Qualification
+
+**预计游戏时长：** 1-2小时
+**Estimated play time:** 1-2 hours
+
+---
+
+### 项目结构 Project Structure
+
+| 文件夹 Folder | 内容 Content |
+|-------------|-------------|
+| `src/prompts/` | AI DM 系统提示、世界设定、NPC 角色描述 |
+| `src/rules/` | 游戏规则（d20 检定、属性、职业等） |
+| `src/scenes/` | 各场景脚本（开场、经营、资格确认等） |
+| `assets/` | 预留：图像生成模板 |
+| `scripts/` | 预留：辅助脚本 |
+
+**支持语言 Supported Languages：** 中文（Chinese）、English
 
 ---
 

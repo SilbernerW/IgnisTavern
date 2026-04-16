@@ -1,6 +1,14 @@
 ---
 name: ignis-tavern
 description: An AI-powered tabletop RPG experience set in the culinary metropolis of Ignis. Players take on the role of a tavern owner in this food-obsessed city and uncover its dark secrets. Supports Chinese and English languages.
+metadata:
+  {
+    "openclaw":
+      {
+        "emoji": "🔥",
+        "homepage": "https://github.com/Kangruchen/IgnisTavern"
+      }
+  }
 ---
 
 # Ignis Tavern / 伊格尼斯酒馆
