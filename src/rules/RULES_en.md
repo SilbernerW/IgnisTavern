@@ -11,10 +11,19 @@
 All checks use **d20 + attribute modifier + proficiency bonus (if any) vs Difficulty Class (DC)**
 
 ```
-d20 + attribute modifier + proficiency bonus  ≥  DC  →  Success
-d20 + attribute modifier + proficiency bonus  <  DC  →  Failure
-d20 = 20（Natural 20）                        →  Critical Success
-d20 = 1（Natural 1）                          →  Critical Failure
+Roll: d20([die roll]) + attribute modifier(+N) + proficiency bonus(+N, if applicable)
+      = [total] vs DC [target]
+      → Success / Failure / Critical (roll of 20) / Critical Fail (roll of 1)
+```
+
+**Display Requirement**: Always show the raw d20 roll number. Never say only "success" or "failure" — the player must see the actual die result.
+
+```
+Correct example:
+「You attempt to persuade the guard. d20(14) + Charisma modifier(+3) = 17 vs DC 15 → Success!」
+
+Incorrect example:
+「You successfully persuaded the guard.」（no d20 number shown）
 ```
 
 ### 1.2 Advantage & Disadvantage
