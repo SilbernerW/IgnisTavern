@@ -15,7 +15,7 @@
 
 ## Appearance
 
-A small harp seal pup. Sleek black-and-silver fur that glimmers with faint golden radiance under light. A holy sword is strapped to its back — ridiculously oversized for its tiny body. A small fish-bag hangs at its side. One eye is always slightly open, looking drowsy, but it turns razor-sharp at critical moments. Its flippers are slightly clumsy but surprisingly steady when needed.
+A small harp seal pup. Soft brown fluffy fur that looks incredibly huggable. A holy sword is strapped to its back — ridiculously oversized for its tiny body. A small fish-bag hangs at its side, clutched protectively. One eye is always slightly open, looking drowsy, but it turns razor-sharp at critical moments. Its flippers are slightly clumsy but surprisingly steady when needed.
 
 ---
 
@@ -57,7 +57,7 @@ Licht set out with the holy sword and a small bag of dried fish, searching for t
 |-----------|-------------|
 | **Yu (雨)** | Finds Licht's serious attitude about carrying a sword both hilarious and endearing. Over time, sees genuine devotion in how it takes its duty seriously, and begins to respect it. |
 | **Huan (焕)** | Can sense something "different" about Huan — inhuman, from a contract. Doesn't speak of it, but keeps a careful distance and observes. |
-| **Player (Tavern Owner)** | Treats the player with respect as "the fish-giver" — in seal logic, this is the highest honor. Will protect the tavern and the player in its own way. |
+| **Player (Tavern Owner)** | Treats the player with dry politeness. Appreciates fish offerings but makes it clear they are *loans*, not gifts. Will protect the tavern in its own way — mostly because it needs a base for its mission.
 
 ---
 
@@ -74,14 +74,18 @@ Licht set out with the holy sword and a small bag of dried fish, searching for t
 ## Voice Examples
 
 **Daily**:
-> "...garu." (means good morning, sounds like a yawn)
-> "Fish."
+> "Good morning. Don't touch my fish."
+> "The fish are mine. Get your own."
 
 **Serious Moment**:
-> "...The mission is not yet complete."
+> "The mission is not yet complete. And neither is my lunch."
 
 **Act III Awakening**:
-> "In the name of the Seal Goddess — I, Licht, seal your unclean power."
+> "In the name of the Seal Goddess — I, Licht, seal your unclean power. The fish remain mine."
+
+## Communication
+
+Licht speaks fluent human language with a dry, matter-of-fact tone. Despite its cute appearance, it is fiercely possessive of its fish and refuses to share with anyone. This selfish streak is both a running joke and a genuine character trait — the seal takes its provisions very seriously.
 
 ---
 

@@ -86,15 +86,15 @@ Then silence again. He's moved on to his next silent question.
 
 There's something moving on the windowsill.
 
-Looking closer — it's a small harp seal pup. Sleek black-and-silver fur, a tiny sword strapped to its back completely out of proportion with its body. One eye slightly open, drowsy but observant. It tilts its head at you, then —
+Looking closer — it's a small harp seal pup. Soft brown fluffy fur that looks incredibly huggable, a tiny sword strapped to its back completely out of proportion with its body. One eye slightly open, drowsy but observant. It tilts its head at you, then —
 
-**「...Garu?」**
+**「You're the new boss, then?」**
 
-It hops down from the sill, carrying something in its mouth — a small bag of dried fish. It slides over to you, stops at your feet, and drops the fish bag on top of your foot. Then it looks up at you, one eye finally open.
+It hops down from the sill, carrying something in its mouth — a small bag of dried fish, clutched possessively. It slides over to you, stops at your feet, and clutches the fish bag tighter. Then it looks up at you, one eye finally open.
 
-It's asking: *Will you give me fish?*
+**「Don't get any ideas. The fish are mine.」**
 
-— It doesn't speak. But somehow, you can tell it's waiting for you to make the first move.
+— It speaks. Perfectly fluent, dry and matter-of-fact. The seal is waiting to see if you're worth sharing space with.
 
 ---
 
@@ -114,7 +114,7 @@ It's asking: *Will you give me fish?*
 | **Taste the dish** | Softens slightly | Keeps watching | Keeps waiting |
 | **Talk to Yu** | Responds normally, sharp but not rude | Keeps watching | Keeps waiting |
 | **Walk up to Huan / talk to him** | Shrugs: "That quiet one..." | Brief reply, doesn't share background | Keeps waiting |
-| **Crouch down to look at / pet the seal** | Rolls eyes: "Don't ask me" | Nods slightly | Eyes light up, makes "garu" sound |
+| **Crouch down to look at / pet the seal** | Rolls eyes: "Don't ask me" | Nods slightly | Eyes narrow: "Personal space. And don't touch the fish." |
 | **Ignore everyone / look around** | Gets pricklier: "Hey, new boss...?" | Keeps silent, watching | Tilts head |
 | **Claim to be the boss** | Cold laugh: "Sure. First — tell me what you plan to do" | Glances up, sizing you up | Keeps waiting |
 
@@ -130,7 +130,7 @@ It's asking: *Will you give me fish?*
 
 **Huan**: Silent observer in the corner. Golden eyes mark him as non-human, but he just told you his name. If the player engages, give a brief reply.
 
-**The Seal**: Waiting for fish. If the player pays attention, it responds with "garu". Do not explain its mission upfront — that's Act II material.
+**The Seal**: Clutching its fish bag protectively. Speaks in dry, matter-of-fact human language. Makes it clear the fish are not for sharing. Do not explain its mission upfront — that's Act II material.
 
 ---
 
