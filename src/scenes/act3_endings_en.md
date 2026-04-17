@@ -275,4 +275,80 @@ Huan's letter on table.
 
 ---
 
+## Ending 8: Despair Ending
+
+**Trigger**: All attributes <10 + all character affection <10
+
+**Condition**: When player at final choice, unable to convince team or take effective action
+
+---
+
+### Beginning of Collapse
+
+**Yu** looks at you, eyes changing from hope to disappointment:
+
+「...You never cared about us, did you?」
+
+「Three months, you never truly cared about anyone. Just... used us.」
+
+**Huan's** flames extinguish, voice cold:
+
+「...I thought you were different. But you're no different from Flame Keepers.」
+
+**Licht** picks up fish bag, turns to leave:
+
+「...Fish won't be shared. Family won't either.」
+
+---
+
+### Lonely Choice
+
+Team falls apart.
+
+**Yu** leaves tavern alone, disappears into night. Found as early sacrifice three days later.
+
+**Huan** goes to Sacred Flame Plaza alone, tries to destroy ritual alone, surrounded by Flame Keepers, contract flames go wild, turns to ash with half the plaza.
+
+**Licht** senses abyss calling, chooses to return — not as holy knight, but as abyss's servant.
+
+**Player** stands alone in empty tavern, holding bank's final notice: tavern will be auctioned.
+
+---
+
+### Night of Ritual
+
+Sacrifice proceeds on schedule.
+
+But this time, ritual goes out of control — because of Huan's death, contract flames create chain reaction.
+
+Abyss rift expands, not consuming one person, but consuming entire Ignis.
+
+City burns in flames, not Sacred Flame's warmth, but abyss's hunger.
+
+Player stands at city gate, watching everything destroyed.
+
+---
+
+### Final Scene
+
+**One Year Later**
+
+Ignis becomes ruins, called 「City of Ash」.
+
+Occasional adventurers enter, see a lonely figure wandering in ruins —
+
+Former tavern owner, gone mad, only repeats one sentence:
+
+「...I should have chosen... I should have...」
+
+**Subtitles**:
+
+「Some mistakes cannot be undone.」
+
+「Some loneliness is deserved.」
+
+「Despair Ending·Complete」
+
+---
+
 *Last Updated: 2026-04-17*
