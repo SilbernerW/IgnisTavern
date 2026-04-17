@@ -44,7 +44,7 @@ He clutches his fish bag tighter, as if reassuring himself it's still there.
 
 He settles onto the floor, sitting upright like a small, fluffy sentinel. The holy sword shifts on his back.
 
-**Licht**: *「My people serve the Deep Sea Goddess. Or what's left of her.」*
+**Licht**: *「My people serve the Supreme Goddess. Or what's left of her.」*
 
 **Licht**: *「She used to protect the depths — all the cold, dark, pressure places. But something happened. A long time ago.」*
 

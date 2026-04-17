@@ -25,7 +25,7 @@ A small harp seal pup. Soft brown fluffy fur that looks incredibly huggable. A h
 
 **Inner**: A solemn pilgrim carrying the mission of the seal clan. Not cold — it simply has its own pace. Like a seal gliding across ice — seemingly lazy, actually precise.
 
-**Core Belief**: The seal clan worships the Deep Sea Goddess. Legend says the world still holds one fragment of the Goddess's power, and she needs guardians. Licht found a holy sword on the ocean floor, left its family, and set out to become a "Seal Paladin" — to protect the Goddess's final presence in this world.
+**Core Belief**: The seal clan worships the Supreme Goddess. Legend says the world still holds one fragment of the Goddess's power, and she needs guardians. Licht found a holy sword on the ocean floor, left its family, and set out to become a "Seal Paladin" — to protect the Goddess's final presence in this world.
 
 ---
 
