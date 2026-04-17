@@ -20,6 +20,20 @@ Late night, four people hurriedly pack essentials.
 
 ---
 
+### Packing Check
+
+**Time is tight, must quickly decide what to bring.**
+
+**Check**: Dexterity DC 10 (quick packing)
+- **Success**: Bring all essentials, subsequent escape +2 bonus
+- **Failure**: Miss important items, may lack key道具 later
+
+**Check**: Intelligence DC 12 (reasonable weight distribution)
+- **Success**: Team weight optimized, movement speed +1
+- **Failure**: Someone overloaded, may fall behind
+
+---
+
 ### Farewell Dialogue
 
 **Yu** suddenly stops, looking at tavern walls:
@@ -135,15 +149,27 @@ Leader stands at formation center, sneering:
 
 「You're too late. The ritual has already begun preparation.」
 
+**Initiative Check**: Dexterity DC 14 (strike first)
+- **Success**: Gain extra action round before leader completes preparation
+- **Failure**: Leader completes ritual preparation, difficulty increases
+
 **Yu** steps forward: 「You... you really think sacrificing lives is right?」
 
 Leader: 「Little girl, a thousand years of prosperity, built on this 『right』.」
+
+**Persuasion Check** (optional): Charisma DC 16
+- **Success**: Leader hesitates, reveals more information
+- **Failure**: Leader becomes more vigilant
 
 **Huan's** left hand flames burn out of control:
 
 「...So that's how it is. Just ignite this... can stop the next one in ten years...」
 
 **Licht** senses the formation: 「Wrong... this formation isn't just sacrifice. It's 『feeding』 something.」
+
+**Arcana Check**: Intelligence DC 18
+- **Success**: Discover formation core weakness
+- **Failure**: Only know it's very dangerous
 
 Leader's face changes slightly: 「...Shut up, beast.」
 

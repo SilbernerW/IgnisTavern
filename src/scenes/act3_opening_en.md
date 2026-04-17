@@ -46,6 +46,21 @@ She looks at you, eyes slightly red:
 
 「Then I met you here. The first place... that didn't lie to me.」
 
+---
+
+### Perception Check (Optional)
+
+**Player can actively observe everyone's condition.**
+
+**Check**: Perception DC 12
+- **Success**: Notice Huan's left hand flames more unstable than usual, seems to sense something
+- **Critical (≥18)**: Discover Licht's fish bag glowing slightly, holy sword resonating
+- **Failure**: Only notice everyone is tense
+
+**Check**: Insight DC 14
+- **Success**: See that although Yu is scared, her eyes are much firmer than three months ago
+- **Failure**: Just think she's shaking
+
 **Huan** takes over:
 
 「...Grey Spring was a small place. But everyone was kind.」

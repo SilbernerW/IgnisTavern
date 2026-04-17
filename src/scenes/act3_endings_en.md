@@ -172,6 +172,20 @@ But Goddess is forever gone.
 
 **Trigger**: All survive + Charisma ≥ 18 + deep bonds
 
+**Final Check Battle**:
+
+**Round 1**: Will DC 16 (resist abyss erosion)
+- **Success**: Stay conscious, continue ritual
+- **Failure**: Someone temporarily失控, needs rescue
+
+**Round 2**: Coordination DC 18 (three-person sync)
+- **Success**: Trinity resonance successful
+- **Failure**: Need extra round to adjust
+
+**Round 3**: Final burst DC 20 (or any attribute max)
+- **Success**: Perfect ending achieved
+- **Failure**: Convert to normal good ending
+
 **Ending Scene**:
 
 Flame Keeper leader: 「Fools! You think you can change a thousand-year contract?」
