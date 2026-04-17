@@ -20,6 +20,8 @@ After closing, the four of you sit around the only intact table. The oil lamp fl
 
 Outside, Ignis sleeps, but from the direction of Sacred Flame Plaza, strange red light glows.
 
+On the table sits a pot of cold stew — Yu made it specially, but nobody has appetite to eat.
+
 **Yu** breaks the silence:
 
 「So. The ritual is tomorrow. What... what are we going to do?」
@@ -27,6 +29,50 @@ Outside, Ignis sleeps, but from the direction of Sacred Flame Plaza, strange red
 She looks at each of you, voice trembling:
 
 「I know Huan wants revenge. I know the new boss wants to protect us. But I just need to know — this time, will someone stay? Or... will I be left alone again?」
+
+---
+
+### Memory Fragments
+
+**Yu** suddenly says:
+
+「You know... before coming here, I worked at 『Old Pig's Den』.」
+
+「Back then I thought, as long as my cooking is good, I can live with dignity.」
+
+「But they made me use bad ingredients, made me lie. I refused, and got kicked out.」
+
+She looks at you, eyes slightly red:
+
+「Then I met you here. The first place... that didn't lie to me.」
+
+**Huan** takes over:
+
+「...Grey Spring was a small place. But everyone was kind.」
+
+「My mother's fish soup, the whole village loved it.」
+
+「That night, flames fell from sky. I thought I died.」
+
+He raises his left hand, blue-green markings alive under light:
+
+「But the contract chose me. Incomplete contract... let me live, and let me remember.」
+
+「Remember every face. Remember their last...」
+
+He can't continue.
+
+**Licht** rarely speaks up voluntarily:
+
+「...My people don't talk about 『loss』.」
+
+「We only talk about 『protection』. Because protection means, you still have something to lose.」
+
+Holding his fish bag, voice low:
+
+「When I left the ocean, I thought I wouldn't lose anything anymore.」
+
+「But now... I find I'm afraid of losing you. This is more... painful than I imagined.」
 
 ---
 

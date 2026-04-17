@@ -20,13 +20,79 @@ Late night, four people hurriedly pack essentials.
 
 ---
 
+### Farewell Dialogue
+
+**Yu** suddenly stops, looking at tavern walls:
+
+「...Three months ago, I almost left here.」
+
+She turns to you:
+
+「Back then I thought, another boss is going to run. Another home is breaking apart.」
+
+She smiles, eyes slightly red:
+
+「But now... I'm actually packing to run. With you.」
+
+**Huan** is silent for a moment, then says:
+
+「...Before Grey Spring disappeared, I also thought I would die there.」
+
+「But the flames chose me. Incomplete contract let me live, and let me suffer.」
+
+He looks at his left hand:
+
+「Now... I don't know if this is curse or gift. But at least, it let me meet you.」
+
+**Licht** holds his fish bag, rarely not talking about fish:
+
+「...My people wouldn't understand. Why build connections with land creatures.」
+
+「But the Supreme Goddess said: 『Protection is not isolation, it's connection』.」
+
+He looks at you:
+
+「I now... somewhat understand.」
+
+**Player Choice**:
+
+1. **「Wherever we go, we go together.」** → Team bond +1
+2. **「When we're safe, we'll open a bigger tavern.」** → Hope +1
+3. **「Let's survive first, then talk.」** → Pragmatic, no bonus
+
+---
+
 ### Crossing the City
 
 Avoid patrols, through alleyways.
 
 **Check**: Dexterity DC 12 (avoid patrols)
 - Success: Reach city gate smoothly
-- Failure: Discovered, someone must draw pursuers away
+- Failure: Discovered, enter 【Encounter Battle】
+
+---
+
+### Encounter Battle (if discovered)
+
+Patrol captain recognizes you: 「People from The Embers! Capture them!」
+
+**Emergency Choice**:
+
+1. **Hide in abandoned warehouse** → Dexterity check DC 14
+   - Success: Temporarily shake off pursuers
+   - Failure: Surrounded, must fight or surrender
+
+2. **Split up and run** → Intelligence check DC 12
+   - Success: Rendezvous at city gate
+   - Failure: Someone lost, need additional search
+
+3. **Licht uses holy sword intimidation** → Holy sword awakening check
+   - Sufficient: Pursuers scared away
+   - Insufficient: Licht weakened, cannot guard rear later
+
+4. **Huan releases contract flames** → Flame失控 risk
+   - Success: Pursuers repelled
+   - Failure: Huan injured, flames more unstable
 
 ---
 
@@ -69,29 +135,65 @@ Leader stands at formation center, sneering:
 
 「You're too late. The ritual has already begun preparation.」
 
+**Yu** steps forward: 「You... you really think sacrificing lives is right?」
+
+Leader: 「Little girl, a thousand years of prosperity, built on this 『right』.」
+
 **Huan's** left hand flames burn out of control:
 
 「...So that's how it is. Just ignite this... can stop the next one in ten years...」
 
-He turns to you, smiling — the first genuine smile in ten years, and desperate.
+**Licht** senses the formation: 「Wrong... this formation isn't just sacrifice. It's 『feeding』 something.」
+
+Leader's face changes slightly: 「...Shut up, beast.」
+
+**Huan** turns to you, smiling — the first genuine smile in ten years, and desperate.
 
 「Boss. Thank you. But I must do this.」
 
+**Yu** pulls Huan: 「Wait! There must be another way!」
+
+**Huan**: 「...What way? Tell me. I've waited ten years, found no other way.」
+
+**Player Emergency Choice**:
+
+1. **「We'll find a way together, don't be impulsive!」** → Enter 【Find Alternative】branch
+2. **「Huan, if you jump, Grey Spring's people died for nothing.」** → Charisma check DC 16
+3. **「Let me think... Licht, can the holy sword destroy the formation?」** → Intelligence check DC 15
+4. **(Silent, let Huan choose himself)** → Huan automatically jumps into formation
+
 ---
 
-### Huan's Self-Immolation Choice
+### 【Find Alternative】Branch (if choose to find way)
 
-**Huan prepares to jump into formation, ignite contract flames, destroy the ritual.**
+**Licht** carefully observes the formation:
 
-**Player choice**:
+「...This formation requires 『contract flames』 as catalyst. But doesn't say it must be Huan's flames.」
 
-1. **Stop him** → Charisma check DC 16
-   - **Success**: Huan burns his memories, loses revenge obsession, survives but "not the same"
-   - **Failure**: Huan dies, sacrifice postponed 137 years
+**Yu**: 「What do you mean?」
 
-2. **Don't stop** → Huan self-immolates, sacrifice postponed 137 years, player lives with guilt
+**Licht**: 「Meaning... any contract power works. Including...」
 
-3. **Replace him** → Player jumps into formation (requires specific conditions)
+He looks at his holy sword: 「Including blessed sacred power.」
+
+**Huan**: 「You mean... you can replace me?」
+
+**Licht**: 「Theoretically. But result is same... I'll lose power, become ordinary seal.」
+
+**Yu**: 「How is that different from Huan losing memories!」
+
+**Licht**: 「Difference is... I was always a seal. Going back, just returning home.」
+
+**Huan** looks at Licht: 「...Are you sure?」
+
+**Licht**: 「...Take care of the fish bag. I'll come back for it.」
+
+**Player Final Choice**:
+
+1. **Let Licht replace Huan** → Enter 【Licht Sacrifice Ending Branch】
+2. **「No, we'll find another way together!」** → Enter 【Perfect Ending Check】 (requires conditions)
+3. **「Huan, this is your choice, I respect you.」** → Huan self-immolates
+4. **「Let me do it.」** → Player jumps into formation (requires all attributes max)
 
 ---
 
@@ -103,11 +205,31 @@ He turns to you, smiling — the first genuine smile in ten years, and desperate
 
 「With my last power... you can seal the abyss... but I will perish with it...」
 
+**Yu**: 「Goddess... why are you helping us?」
+
+**Goddess** (smiling): 「Because you remind me of... long ago, I also had family.」
+
+「I created the first seals, watched them walk to land, become humans...」
+
+「I thought I lost them. But you... you proved, bonds aren't changed by form.」
+
 **Licht** looks at the Goddess:
 
 「...She helped me. When I was still an abyssal creature.」
 
+「Back then I feared her, because she saw my essence, but didn't destroy me.」
+
+**Huan**: 「...So that's why. Why you bless equally.」
+
+**Goddess**: 「Go. Seal the abyss. Then... live well.」
+
 **Three receive Goddess's blessing**, power temporarily boosted.
+
+**Huan's flames** turn golden, no longer painful.
+
+**Yu's recipe book** glows, ingredients automatically combine.
+
+**Licht's holy sword** fully awakens, no longer oversized, but perfectly fitting.
 
 ---
 
