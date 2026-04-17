@@ -277,7 +277,7 @@ Huan's letter on table.
 
 ## Ending 8: Despair Ending
 
-**Trigger**: All attributes <10 + all character affection <10
+**Trigger**: All character affection <20 (extremely poor relationships, team falls apart)
 
 **Condition**: When player at final choice, unable to convince team or take effective action
 
