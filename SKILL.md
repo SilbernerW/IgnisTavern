@@ -53,6 +53,8 @@ This is the complete flow for a full 1-2 hour session. Follow each step in order
 
 **Announce**: "语言已确认。游戏现在开始。" / "Language confirmed. The game begins now."
 
+**Then proceed to Step 1.**
+
 ---
 
 ### Step 1: Character Creation
@@ -137,6 +139,8 @@ Briefly confirm the character's name and template/attributes. Keep backstory vag
 **AI Action**: Load and begin the opening scene script.
 
 **File**: `src/scenes/act1_opening_zh.md` (or `*_en.md`)
+
+**After reading the scene narrative aloud**: Present a options menu (2-3 directional choices) per Rule 12. Do not end with a bare "What do you do?" — always give concrete options that move the story forward.
 
 **Key Design Change**: All three characters are already present when the player arrives at the tavern. They are not waiting to be recruited; they are on "probation," deciding whether the new boss is worth staying for. **Do not say their names until they introduce themselves in-character.**
 
