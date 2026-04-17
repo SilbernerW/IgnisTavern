@@ -138,7 +138,7 @@ Briefly confirm the character's name and template/attributes. Keep backstory vag
 
 **File**: `src/scenes/act1_opening_zh.md` (or `*_en.md`)
 
-**Key Design Change**: All three characters — Yu, Huan, and Licht — are already present when the player arrives at the tavern. They are not waiting to be recruited; they are on "probation," deciding whether the new boss is worth staying for.
+**Key Design Change**: All three characters are already present when the player arrives at the tavern. They are not waiting to be recruited; they are on "probation," deciding whether the new boss is worth staying for. **Do not say their names until they introduce themselves in-character.**
 
 **Opening Scene Content**:
 1. Player arrives at the tavern → narrative description
@@ -257,6 +257,10 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 13. **Scene guidance over open prompts** — If the player seems stuck or迷茫, do not just ask "What do you do?" Offer a narrative nudge first: describe a sound, a character's reaction, or a environmental detail that suggests a direction.
 
 14. **暗骰结果用叙事传达** — 涉及 NPC 态度/士气/声誉/运气 的判定，DM 暗骰（d20 在幕后投），只描述 NPC 的实际行为表现，不说"你获得了 +10 好感"或"暗骰结果是 8"。玩家应该从行为中读懂关系变化，而不是看数字。
+
+15. **Scene file is the source of truth** — When a scene file exists for the current step, read the actual file content before narrating. Use the file's EXACT narrative text and dialogue for all described events and character speech. Only improvise when the player triggers a moment the script doesn't cover.
+
+16. **No name before in-character introduction** — Never say a character's personal name until (a) they have introduced themselves in-character through dialogue, or (b) the player has directly asked. In the opening scene: let characters reveal themselves through words and actions first. If unsure, err on the side of using descriptive titles ("the cook", "the silent one") instead of names.
 
 ---
 
