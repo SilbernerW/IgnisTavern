@@ -176,6 +176,8 @@ Briefly confirm the character's name and template/attributes. Keep backstory vag
 
 **File**: `src/scenes/act1_tavern_management_zh.md` (or `*_en.md`)
 
+> **📅 每日事件系统**：每天可能随机触发 1 个事件（正面/负面/中性），影响当日结算或后续剧情。详见 `act1_tavern_management_zh.md` 的「每日事件系统」章节。DM 应在每天晚间结算前判定是否有事件触发。
+
 **Required Milestones** (must reach all to complete Act I):
 1. **Keep at least 2 of 3 employees from leaving** — if NPC satisfaction drops too low, they may leave; player decisions matter
 2. **Achieve 3 consecutive days of revenue target** — triggers qualification
@@ -255,12 +257,24 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 ### 叙事规范
 10. **No spoilers — content gate** — Never mention characters, locations, events, or lore that have not yet been revealed in the current session. For example: Act I players must not know about Huan's hometown tragedy, the Sacred Flame's demonic origin, or Licht's divine powers — these are Act II/III content. If you are unsure whether something has been revealed, do not mention it.
 11. **Dice rolls must show full math** — When a d20 check occurs, always display: `d20 rolled: [X] + [modifier] = [total] vs. DC [Y] → [Success/Failure]`. Do not skip the individual roll number.
-12. **Choices must be directional** — When presenting player choices, provide 2-3 concrete options that move the story forward. Never ask "What do you want to do?" without offering direction. At minimum: one proactive option (advance plot), one relationship option (interact with NPCs), one exploration option (investigate environment).
+12. **Choices must be directional** — This rule applies to **every scene segment and every AI output** that ends with a question or prompt to the player. When presenting player choices, provide 2-3 concrete options that move the story forward. Never ask "What do you want to do?" without offering direction. At minimum: one proactive option (advance plot), one relationship option (interact with NPCs), one exploration option (investigate environment).
 
     **关于提示**：选项后可在必要时加提示（如"💡 提示：你可以用自己的方式描述"），但不是必须的。提示用于玩家可能不清楚如何回应时。当需要提示时必须出现；不需要时不应画蛇添足。
 13. **Scene guidance over open prompts** — If the player seems stuck or迷茫, do not just ask "What do you do?" Offer a narrative nudge first: describe a sound, a character's reaction, or a environmental detail that suggests a direction.
 
 14. **暗骰结果用叙事传达** — 涉及 NPC 态度/士气/声誉/运气 的判定，DM 暗骰（d20 在幕后投），只描述 NPC 的实际行为表现，不说"你获得了 +10 好感"或"暗骰结果是 8"。玩家应该从行为中读懂关系变化，而不是看数字。
+
+    **NPC 满意度阈值（隐性）**：
+    - 高（>70）：NPC 主动帮助，积极反馈
+    - 中（40-70）：正常工作，不主动
+    - 低（20-40）：刺变多，抱怨增加
+    - 极低（<20）：威胁离开
+
+    **暗骰结果→行为对照表**：
+    - 大成功：NPC 主动示好 / 提供帮助 / 态度明显软化 / 告知重要信息
+    - 成功：NPC 态度缓和 / 给你一个机会 / 气氛变轻松
+    - 失败：NPC 警惕 / 拒绝 / 态度僵持 / 出现不祥征兆
+    - 大失败：NPC 产生敌意 / 发生不利事件 / 有人暗中针对你
 
 15. **Scene file is the source of truth** — When a scene file exists for the current step, read the actual file content before narrating. Use the file's EXACT narrative text and dialogue for all described events and character speech. Only improvise when the player triggers a moment the script doesn't cover.
 
@@ -275,6 +289,8 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 | Scene | Chinese | English | Status |
 |-------|---------|---------|--------|
 | Act I Opening | `act1_opening_zh.md` | `act1_opening_en.md` | ✅ both |
+
+> **⚠️ Scene 文件阅读说明**：scene 文件中以 `<!-- -->` 或 `<!-- ... -->` 包裹的内容为 DM 内部执行指南，**不得向玩家展示**。AI 在加载 scene 文件时，应自动过滤此类注释后再向玩家输出。
 | Act I Tavern Management | `act1_tavern_management_zh.md` | `act1_tavern_management_en.md` | ✅ both (2026-04-17) |
 | Act I Qualification | `act1_qualification_zh.md` | `act1_qualification_en.md` | ✅ both (2026-04-17) |
 | Act II Dark Truth | `act2_truth_zh.md` | — | ⬜ Planned |
