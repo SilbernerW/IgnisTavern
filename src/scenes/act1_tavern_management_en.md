@@ -254,7 +254,7 @@ Evening. The last table of customers has left.
 
 Today's operation is over. Yu is washing dishes in the kitchen. Huan rests against the wall in the corner, eyes closed. Licht has already fallen asleep on the windowsill.
 
-"Not bad today." Yu's voice drifts from the kitchen — surprisingly without its usual edge. "Ingredients were just okay, but the flavor didn't fail. See you tomorrow."
+"Not bad today." Yu's voice drifts from the kitchen — there's a reluctant warmth in it, quickly covered by her usual briskness. "Ingredients were just okay, but the flavor didn't fail. Don't get used to it though — tomorrow might be worse. See you tomorrow."
 
 You served XX customers today, income: XX copper. Consecutive days on target: 1/3.
 
@@ -264,13 +264,13 @@ Tomorrow is a new day.
 ### Loss Day (Example)
 
 ```
-Evening. Yu stands behind the bar, expression cold.
+Evening. Yu stands behind the bar, expression sharp but not quite as cold as she's trying to appear.
 
-"Today's customers were half of yesterday's." She polishes a glass. "Old Pig Sty is spreading rumors — saying we use expired stuff."
+"Today's customers were half of yesterday's." She polishes a glass with more force than necessary. "Old Pig Sty is spreading rumors — saying we use expired stuff."
 
 Huan opens his eyes from the corner, glances at you, then closes them again.
 
-"Got to figure something out tomorrow." Yu says. "Otherwise by day three we won't be able to stay open."
+Yu sets the glass down harder than she needs to. "Got to figure something out tomorrow. Otherwise by day three we won't be able to stay open." She pauses, almost adding something, then turns back to the dishes. "...Don't make me regret staying."
 
 Consecutive days on target: 0/3. Tomorrow's crisis level: ⚠️
 ```

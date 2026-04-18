@@ -40,13 +40,13 @@ Late night, four people hurriedly pack essentials.
 
 「...Three months ago, I almost left here.」
 
-She turns to you:
+She turns to you, her voice carrying that familiar sharp edge:
 
 「Back then I thought, another boss is going to run. Another home is breaking apart.」
 
-She smiles, eyes slightly red:
+She smiles, eyes slightly red — but she blinks hard, looking away:
 
-「But now... I'm actually packing to run. With you.」
+「But now... I'm actually packing to run. With you.」 She sniffs, turning back to her packing with unnecessary force. 「...Don't make me regret this. I swear, if you slow me down, I'm leaving you behind.」
 
 **Huan** is silent for a moment, then says:
 

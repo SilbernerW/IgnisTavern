@@ -80,7 +80,7 @@ Her voice is soft — more to herself than to you.
 But the next day, he was gone.
 Called — no answer. Went to the address he gave — empty house."
 
-She sets the glass down and finally looks at you.
+She sets the glass down and finally looks at you. Her eyes are fierce, but there's something fragile underneath.
 
 "I waited for a month."
 
@@ -89,13 +89,15 @@ She doesn't say more. But you understand.
 She wasn't waiting for a boss.
 She was waiting for someone who wouldn't run.
 
-As you turn to leave, her voice comes again:
+As you turn to leave, her voice comes again — sharper now, almost defensive:
 
-"...I'll figure out tomorrow's menu. The Association people might come early."
+"...Don't get any ideas. I'm just saying. Someone has to keep this place running, and apparently that someone is me."
 
-Her tone is already back to its usual sharpness.
+She turns back to the glass, her movements brisk again.
 
-But that moment of vulnerability — you know it was real.
+"I'll figure out tomorrow's menu. The Association people might come early. Go get some sleep — you look terrible."
+
+Her tone is back to its usual barbs. But that moment of vulnerability — you know it was real.
 ```
 
 ---

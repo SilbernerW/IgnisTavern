@@ -16,9 +16,9 @@ Three months later, border town.
 
 A new tavern opens, sign reads 「Embers·Reborn」.
 
-**Yu** busy in kitchen, **Huan** wiping tables, **Licht** sunbathing on windowsill.
+**Yu** busy in kitchen, shouting orders with her usual fire: 「Huan! Table three needs wiping! Licht, stop sunbathing and help!」 **Huan** wiping tables, **Licht** sunbathing on windowsill.
 
-**Yu**: 「New boss, today's fish arrived.」
+**Yu**: 「New boss, today's fish arrived.」 She pauses, then adds gruffly: 「...It's actually fresh this time. Don't mess it up.」
 
 **Huan**: 「...It's quiet here. No Sacred Flame, no Flame Keepers.」
 
@@ -96,7 +96,7 @@ Ritual destroyed, Flame Keepers scattered.
 
 He lost all memories — revenge, hometown, even you.
 
-**Yu**: 「...He's alive. That's enough.」
+**Yu**: 「...He's alive. That's enough.」 She crosses her arms, looking away. 「...Don't look at me like that. I'm just stating facts. It's not like I was worried or anything.」
 
 **Licht**: 「...Memories can rebuild. People can't.」
 
@@ -126,7 +126,7 @@ Flames consume him, consume the formation.
 
 Ritual interrupted, but Huan also disappears.
 
-**Yu**: 「...He did it. He took revenge.」
+**Yu**: 「...He did it. He took revenge.」 Her voice is hollow. Then, sharper: 「...Idiot. We could have found another way. There always is one.」
 
 **Licht**: 「...The cost is. He became the flame itself.」
 
@@ -190,7 +190,7 @@ But Goddess is forever gone.
 
 Flame Keeper leader: 「Fools! You think you can change a thousand-year contract?」
 
-**Yu** takes out a pot of stew: 「I don't know if we can change the contract. But I know some things are older than contracts.」
+**Yu** takes out a pot of stew, her hands steady despite everything: 「I don't know if we can change the contract. But I know some things are older than contracts.」 She glances at the others, almost defensive. 「...And yes, I made this specially. Don't ask me why. I'm just hungry.」
 
 **Huan**: 「My hometown... their memories. Not hatred. The wish to live.」
 

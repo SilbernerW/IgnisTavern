@@ -22,19 +22,21 @@ Outside, Ignis sleeps, but from the direction of Sacred Flame Plaza, strange red
 
 On the table sits a pot of cold stew — Yu made it specially, but nobody has appetite to eat.
 
-**Yu** breaks the silence:
+**Yu** breaks the silence, her voice sharp but with an undercurrent of fear:
 
 「So. The ritual is tomorrow. What... what are we going to do?」
 
-She looks at each of you, voice trembling:
+She looks at each of you, her usual fire dampened by worry:
 
 「I know Huan wants revenge. I know the new boss wants to protect us. But I just need to know — this time, will someone stay? Or... will I be left alone again?」
+
+She crosses her arms, almost defensive. 「...Don't look at me like that. I'm just asking. Someone has to be practical here.」
 
 ---
 
 ### Memory Fragments
 
-**Yu** suddenly says:
+**Yu** suddenly says, her voice carrying an edge of old anger:
 
 「You know... before coming here, I worked at 『Old Pig's Den』.」
 
@@ -42,9 +44,11 @@ She looks at each of you, voice trembling:
 
 「But they made me use bad ingredients, made me lie. I refused, and got kicked out.」
 
-She looks at you, eyes slightly red:
+She looks at you, eyes slightly red — but she blinks hard, refusing to let tears fall.
 
 「Then I met you here. The first place... that didn't lie to me.」
+
+She sniffs, turning away slightly. 「...I'm not crying. It's just dusty in here. This place is falling apart, you know.」
 
 ---
 
@@ -58,7 +62,7 @@ She looks at you, eyes slightly red:
 - **Failure**: Only notice everyone is tense
 
 **Check**: Insight DC 14
-- **Success**: See that although Yu is scared, her eyes are much firmer than three months ago
+- **Success**: See that although Yu is scared, her eyes are much firmer than three months ago — she's terrified, but she's standing her ground
 - **Failure**: Just think she's shaking
 
 **Huan** takes over:
@@ -133,14 +137,14 @@ He looks down at the fish bag, then up:
 
 1. **「We run. Leave Ignis, start somewhere else.」**
    - Enter 【Save Family Route】
-   - Yu: 「...Running again. But this time, someone comes with me.」
+   - Yu: 「...Running again. But this time, someone comes with me.」 She pauses, then adds gruffly: 「Don't get any ideas. I'm just saying. It's not like I care or anything.」
    - Huan: 「...Good. At least you'll survive.」
    - Licht: 「Fish bag is already packed.」
 
 2. **「We stop the ritual. Can't let them kill again.」**
    - Enter 【Save City Route】
    - Huan: 「...You'll help me take revenge?」
-   - Yu: 「Too dangerous! But if this is your decision... I support it.」
+   - Yu: 「Too dangerous! Are you crazy? But if this is your decision...」 She throws up her hands. 「...Fine. I support it. Someone has to keep you idiots alive, and apparently that someone is me.」
    - Licht: 「My sword will help. But don't expect me to share fish.」
 
 3. **(Hidden option, requires conditions)「There must be another way...」**

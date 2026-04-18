@@ -44,11 +44,11 @@ Three people.
 
 ### The One in the Kitchen
 
-Most visible is a petite figure standing in the kitchen. She's wearing a sweat-soaked tank top, dark short hair clinging to her neck from the humidity, gripping a spatula — which is trembling with anger.
+Most visible is a petite figure standing in the kitchen. She's wearing a sweat-soaked tank top, dark short hair clinging to her neck from the humidity, gripping a spatula — which is trembling.
 
 She turns around.
 
-Sharp eyes scan you from head to toe, then roll dramatically.
+Sharp eyes scan you from head to toe, then she lets out a sigh.
 
 **「Name's Yu. — So you're the new boss?」**
 
@@ -56,9 +56,9 @@ She slings the spatula over her shoulder.
 
 **「Fine. The equipment is so old it makes me cry, all the ingredients are spoiled, and the pipes are leaking. How much money do you have? Enough to last till next week?」**
 
-She talks like a machine gun, not giving you a chance to interject.
+She talks fast, not giving you a chance to interject. But then she pauses, almost as if catching herself.
 
-**「Forget it. Try this first.」**
+**「...Forget it. Try this first.」**
 
 She pushes a small plate toward you. Some kind of spicy stew — the color is suspicious, but the smell is unexpectedly enticing.
 
@@ -142,7 +142,7 @@ It hops down from the sill, carrying something in its mouth — a small bag of d
 
 **「Alright, new boss. Since you're actually trying — let me tell you the state of this dump. Listen carefully, I only say it once.」**
 
-Yu counts on her fingers:
+Yu counts on her fingers, each number delivered with increasing exasperation:
 
 **「First, the equipment is ancient. The stove's heating is unstable, the fridge might explode tomorrow.」**
 
@@ -150,11 +150,11 @@ Yu counts on her fingers:
 
 **「Third, the competition. Old Pig's Den — over in Fire Lane — they're squeezing us out. Spreading rumors that we use expired ingredients.」**
 
-She pauses, lowers her voice.
+She pauses, lowers her voice. For a moment, she almost looks concerned — but then her sharpness returns.
 
 **「Fourth... the Gourmet Association might come for a surprise inspection. If the rating's too low, our license gets revoked.」**
 
-She looks at you, expression complicated.
+She looks at you, expression complicated — like someone who's been disappointed before but hasn't quite given up hope.
 
 **「So — what are you going to do?」**
 
@@ -172,7 +172,7 @@ She looks at you, expression complicated.
 | Response | AI DM Response |
 |----------|---------------|
 | 「Fix the equipment first」 | Yu nods: 「Finally, someone with sense. I know an old blacksmith, but you'll need money first.」 Huan shifts slightly — assessing your practicality. |
-| 「Talk to the suppliers」 | Yu cold-laughs: 「Won't work. They only take cash.」 |
+| 「Talk to the suppliers」 | Yu sighs: 「Won't work. They only take cash. But... if you can find someone who still trusts this place, let me know.」 |
 | 「Deal with Old Pig's Den」 | Yu's expression changes: 「...You've got a brain. Old Pig's Den isn't simple.」 Huan speaks up: 「I've seen them.」 |
 | 「When does the inspection come?」 | Yu gets serious: 「Not sure. Could be three days, could be tomorrow. We're running out of time.」 |
 | 「What do you suggest?」 | Yu thinks for a moment: 「...Get today's dishes sorted first. Not enough ingredients, but if you can get fresh fish...」 Licht's ear perks up at the word "fish." |
@@ -203,9 +203,9 @@ She looks at you.
 
 **「You have seven days. If you can't make it by then — you leave. Don't drag me down with you.」**
 
-She pauses, glances at Huan, then at Licht.
+She pauses, glances at Huan, then at Licht. Her voice drops, almost reluctant.
 
-**「...Don't drag them down either.」**
+**「...Don't drag them down either. They've got nowhere else to go.」**
 
 ---
 
