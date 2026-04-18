@@ -174,7 +174,7 @@ If the player says something like "I want to stay a bit longer" at the transitio
 
 ### Act II Entry
 
-Act II's scene file is act2_truth_en.md. After the player confirms to continue, load that file.
+Act II's scene file is act2_main_en.md. After the player confirms to continue, load that file.
 -->
 
 ## 📝 Technical Notes

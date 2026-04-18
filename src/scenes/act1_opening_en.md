@@ -287,7 +287,7 @@ This is the most important change from earlier drafts. All three employees are a
 
 - Characters' personalities shown through words and actions, not exposition
 - Huan's silent presence in the corner must be maintained — he doesn't insert himself like Yu does
-- Licht's "garu" is an emotional tone regulator, used to diffuse tension
+- Licht's dry one-liners are an emotional tone regulator, used to diffuse tension
 - After player makes a choice, let **at least two characters** react
 -->
 

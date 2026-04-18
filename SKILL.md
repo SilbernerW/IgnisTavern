@@ -451,9 +451,14 @@ ignis-tavern/
 │       ├── act1_tavern_management_en.md  # ✅ Daily loop (English)
 │       ├── act1_qualification_zh.md    # ✅ Qualification (Chinese)
 │       ├── act1_qualification_en.md    # ✅ Qualification (English)
-│       ├── act2_truth_zh.md    # ⬜ Act II
-│       ├── act3_choice_zh.md  # ⬜ Act III
-│       └── ...
+│       ├── act2_main_zh.md       # ✅ Act II (Chinese)
+│       ├── act2_main_en.md       # ✅ Act II (English)
+│       ├── act3_opening_zh.md     # ✅ Act III Opening (Chinese)
+│       ├── act3_opening_en.md     # ✅ Act III Opening (English)
+│       ├── act3_confrontation_zh.md  # ✅ Act III Confrontation (Chinese)
+│       ├── act3_confrontation_en.md  # ✅ Act III Confrontation (English)
+│       ├── act3_endings_zh.md     # ✅ Act III Endings (Chinese)
+│       └── act3_endings_en.md     # ✅ Act III Endings (English)
 ├── assets/
 └── scripts/
 ```
@@ -465,5 +470,5 @@ ignis-tavern/
 | NPC | Role | Probation Reason |
 |-----|------|-----------------|
 | **Yu (雨)** | Head Chef | Afraid of abandonment; needs to see player won't run |
-| **Licht (利希特)** | Mascot / Guardian | On a pilgrimage; the port is on its route; also: fish |
+| **Licht (利希特)** | Paladin / Guardian | On a pilgrimage for the Supreme Goddess; the port is on its route; also: fish |
 | **Huan (焕)** | Fighter | Investigating the Sacred Flame; the tavern is a useful base and cover |

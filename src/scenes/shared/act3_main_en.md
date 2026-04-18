@@ -1,5 +1,15 @@
 # Act III · The Choice
 
+> ⚠️ **This file has been superseded by split versions.**
+> Act III has been split into three separate files. This file is kept for historical reference only:
+> - `act3_opening_en.md` — Opening + Character positions
+> - `act3_confrontation_en.md` — Confrontation + Action routes
+> - `act3_endings_en.md` — 7 + 1 endings
+>
+> AI DM: Load the split files instead of this one.
+
+---
+
 > **Scene Type**: Moral climax / Ending
 > **Estimated Duration**: 20-30 minutes
 > **Purpose**: Final choice, one of multiple endings, final team bond confirmation

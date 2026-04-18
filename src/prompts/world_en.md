@@ -73,8 +73,8 @@ To qualify, you need:
 - **Day 1**: Opening — all three characters meet, tavern operations begin
 - **Day 2**: Gourmet Association inspection, Old Pig's Den confrontation
 - **Day 3**: Festival preliminary round (if targets met)
-- **Day 7** (if continued): Festival finals + Act II revelation
-- **Day 14** (if continued): Act III · The Choice
+- **Days following**: Act II revelation — the truth of the Sacred Flame surfaces
+- **Eve of the sacrifice ritual**: Act III · The Choice — save your family or save the city, seven possible endings
 
 ---
 
