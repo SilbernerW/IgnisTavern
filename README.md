@@ -159,9 +159,15 @@ Language → Character Creation → Act I Management → Qualification
 - 日经营系统（中文/English）
 - 资格确认场景（中文/English）
 
-### 第二幕 & 第三幕（开发中 / In Development）🔶
-- 部分场景文件已创建
-- 完整剧本进行中
+### 第二幕（Partially Implemented）⚠️
+- 主线框架已完成（中文）
+- 英文版待补全
+- NPC Act II 对话已完成（中文）
+
+### 第三幕（Fully Implemented）✅
+- 开场场景（中文/English）
+- 对峙场景（中文/English）
+- 7 个结局完整剧本（中文/English）
 
 ---
 

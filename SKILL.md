@@ -302,13 +302,11 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 
 ---
 
-### Future Expansion (Not Yet Implemented)
+### Future Expansion
 
-**Act II — The Dark Truth** and **Act III — The Choice** are planned but not yet implemented. When they are ready, the session will continue from the qualification scene with the following themes:
+**Act II — The Dark Truth**: Huan's investigation leads to the truth behind Ignis's Sacred Flame — a demonic bargain that demands a human tribute every ten years. The player's found family is now in danger.
 
-**Act II (planned)**: Huan's investigation leads to the truth behind Ignis's Sacred Flame — a demonic bargain that demands a human tribute every ten years. The player's found family is now in danger.
-
-**Act III (planned)**: The Trolley Problem — save the found family, or save the city. No correct answer. Both choices have permanent, devastating consequences.
+**Act III — The Choice**: The Trolley Problem — save the found family, or save the city. No correct answer. Both choices have permanent, devastating consequences. Act III is fully scripted with 7 distinct endings.
 
 ---
 
@@ -373,12 +371,12 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 | Scene | Chinese | English | Status |
 |-------|---------|---------|--------|
 | Act I Opening | `act1_opening_zh.md` | `act1_opening_en.md` | ✅ both |
-
-> **⚠️ Scene 文件阅读说明**：scene 文件中以 `<!-- -->` 或 `<!-- ... -->` 包裹的内容为 DM 内部执行指南，**不得向玩家展示**。AI 在加载 scene 文件时，应自动过滤此类注释后再向玩家输出。
-| Act I Tavern Management | `act1_tavern_management_zh.md` | `act1_tavern_management_en.md` | ✅ both (2026-04-17) |
-| Act I Qualification | `act1_qualification_zh.md` | `act1_qualification_en.md` | ✅ both (2026-04-17) |
-| Act II Dark Truth | `act2_truth_zh.md` | — | ⬜ Planned |
-| Act III The Choice | `act3_choice_zh.md` | — | ⬜ Planned |
+| Act I Tavern Management | `act1_tavern_management_zh.md` | `act1_tavern_management_en.md` | ✅ both |
+| Act I Qualification | `act1_qualification_zh.md` | `act1_qualification_en.md` | ✅ both |
+| Act II Dark Truth | `act2_main_zh.md` | `act2_main_en.md` | ⚠️ Chinese only |
+| Act III Opening | `act3_opening_zh.md` | `act3_opening_en.md` | ✅ both |
+| Act III Confrontation | `act3_confrontation_zh.md` | `act3_confrontation_en.md` | ✅ both |
+| Act III Endings (7 endings) | `act3_endings_zh.md` | `act3_endings_en.md` | ✅ both |
 
 ---
 
