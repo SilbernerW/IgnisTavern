@@ -238,7 +238,7 @@ Briefly confirm the character's name and template/attributes. Keep backstory vag
 | Character | What Makes Them Stay |
 |-----------|---------------------|
 | **Yu (雨)** | Player proves to be reliable — willing to work, willing to take responsibility, doesn't run |
-| **Huan (焕)** | Player proves trustworthy — his investigation into the Sacred Flame leads him here; the tavern is a useful cover and a place to think |
+| **Huan (焕)** | Player proves trustworthy — the ghostfire's anomaly drew him here; the tavern is a useful base while he investigates what the flame is reacting to |
 | **Licht (利希特)** | Player gives it fish (seal logic) — and the tavern is on its mission route (near the port/smuggler passage) |
 
 **Completion Condition**: When the player has understood the three conditions for festival qualification (at least 2 employees staying, 3 days revenue, pass inspection), announce:
@@ -471,4 +471,4 @@ ignis-tavern/
 |-----|------|-----------------|
 | **Yu (雨)** | Head Chef | Afraid of abandonment; needs to see player won't run |
 | **Licht (利希特)** | Paladin / Guardian | On a pilgrimage for the Supreme Goddess; the port is on its route; also: fish |
-| **Huan (焕)** | Fighter | Investigating the Sacred Flame; the tavern is a useful base and cover |
+| **Huan (焕)** | Fighter | Drawn to Ignis by the ghostfire's anomaly; the tavern is a useful base while he investigates |

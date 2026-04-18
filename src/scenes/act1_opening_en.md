@@ -68,7 +68,7 @@ She pushes a small plate toward you. Some kind of spicy stew — the color is su
 
 In the darkest corner by the bar, someone is standing against the wall.
 
-Messy black hair falls over his eyes. Golden pupils glow faintly in the dim light — in itself a mark of something inhuman. His left hand hangs at his side, faint blue-green markings on the back, like an old burn that's still healing.
+Messy black hair falls over his eyes. Golden pupils glow faintly in the dim light — not a natural color, but the mark of some change. His left hand hangs at his side, faint blue-green markings on the back, like an old burn that's still healing.
 
 He says nothing. Just watches you.
 
