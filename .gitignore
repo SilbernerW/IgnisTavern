@@ -42,15 +42,6 @@ venv/
 *.sqlite
 
 # ========== AI / ML Outputs ==========
-# Ignore AI-generated images except project assets
-*.png
-*.jpg
-*.jpeg
-*.webp
-!assets/images/**/*.png
-!assets/images/**/*.jpg
-!assets/images/**/*.jpeg
-!assets/images/**/*.webp
 generated/
 output/
 *.output
