@@ -28,7 +28,7 @@ Legend says a thousand years ago, the city faced invasion from a demonic rift. A
 
 **This is why Ignis's food is so extraordinarily delicious — a fragment of the demonic bargain's power seeps into the ingredients.**
 
-Huan's hometown, ten years ago, was one of the villages selected for tribute. His entire family was killed, and only he survived the demonic fire, gaining incomplete contract powers.
+Huan's hometown of Grey Springs (灰泉镇), ten years ago, was one of the villages selected for tribute. His parents died in the fire, and his younger sister became separated from him in the chaos — her fate unknown. Huan survived by hiding in a cellar, then spent eight years as a mercenary. Two years ago, near death after a monster hunt, he made a pact with a demon and gained the power to command blue-green ghostfire. What he doesn't know: the demon he contracted with is the very same one that destroyed Grey Springs.
 
 ---
 
