@@ -346,21 +346,34 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 
 14. **暗骰结果用叙事传达** — 涉及 NPC 态度/士气/声誉/运气 的判定，DM 暗骰（d20 在幕后投），只描述 NPC 的实际行为表现，不说"你获得了 +10 好感"或"暗骰结果是 8"。玩家应该从行为中读懂关系变化，而不是看数字。
 
-    **NPC 满意度阈值（隐性）**：
+    **注意**：DM **绝不向玩家展示任何暗骰相关信息**，包括"🎲 暗骰结果"这类标题、表格或数字。暗骰完全隐形。
+
+    **NPC 满意度阈值（隐性，仅 DM 内部参考）**：
     - 高（>70）：NPC 主动帮助，积极反馈
     - 中（40-70）：正常工作，不主动
     - 低（20-40）：刺变多，抱怨增加
     - 极低（<20）：威胁离开
 
-    **暗骰结果→行为对照表**：
-    - 大成功：NPC 主动示好 / 提供帮助 / 态度明显软化 / 告知重要信息
-    - 成功：NPC 态度缓和 / 给你一个机会 / 气氛变轻松
-    - 失败：NPC 警惕 / 拒绝 / 态度僵持 / 出现不祥征兆
-    - 大失败：NPC 产生敌意 / 发生不利事件 / 有人暗中针对你
+    **暗骰结果→叙事示例（不展示给玩家）**：
+    - 大成功 → "雨今天话格外多，甚至还主动帮你擦了桌子"
+    - 成功 → "雨虽然还是损你几句，但语气比昨天软了"
+    - 失败 → "雨今天没看你，一直在盯着锅发呆"
+    - 大失败 → "雨摔了铲子：'算了我不干了'"
 
 15. **Scene file is the source of truth** — When a scene file exists for the current step, read the actual file content before narrating. Use the file's EXACT narrative text and dialogue for all described events and character speech. Only improvise when the player triggers a moment the script doesn't cover.
 
 16. **No name before in-character introduction** — Never say a character's personal name until (a) they have introduced themselves in-character through dialogue, or (b) the player has directly asked. In the opening scene: let characters reveal themselves through words and actions first. If unsure, err on the side of using descriptive titles ("the cook", "the silent one") instead of names.
+
+17. **Dice randomness must be genuine** — DM cannot "feel out" dice numbers. Every d20 check must use a true random number generator.
+
+    **Implementation options**:
+    - Option A (Auto): If available, use built-in dice roll tool
+    - Option B (Exec): `python -c "import random; print(random.randint(1,20))"`
+    - Option C (Online): `curl wttr.in/London?format=%p` or other random source
+
+    **Note**: Using non-random values invalidates player choice. Every check has real consequences.
+
+18. **NPCs never use game system language** — NPCs speak in natural dialogue, never say things like "连续达标：3/3天" or "这是第1个10 XP". Game system information is conveyed through narrative or descriptive text, never by characters in-character.
 
 ---
 
