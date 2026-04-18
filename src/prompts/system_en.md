@@ -25,7 +25,7 @@
 **Core Characters**:
 - **Yu (雨)**: Spicy-tongued head chef, sharp-tongued but deeply loyal; former sous-chef at a famous restaurant
 - **Licht (利希特)**: A harp seal pilgrim carrying a holy sword. Guardian of the Supreme Goddess. Speaks human language with a dry, matter-of-fact tone. Extremely protective of his fish — will not share under any circumstances. Can sense demonic/contract powers.
-- **Huan**: Contract demon of flames, disguised as a survivor from a destroyed village
+- **Huan**: A warrior bound by a demon contract, blue-green ghostfire burning from his left hand. Truly a survivor from the destroyed village of Grey Springs — unknowingly contracted with the very demon that destroyed his home
 
 ---
 
