@@ -82,9 +82,9 @@ Huan's golden eyes stare at some distant place.
 |-------|-------------|------|-----------------|
 | Huan reveals his past | Huan | Team Member C | `npc/huan/dialogue/act2_revelation.md` |
 | Yu's reaction to learning the truth | Yu | Team Member A | `npc/yu/dialogue/act2_yu_reaction.md` |
-| Licht senses something abnormal | Licht | Team Member B | `npc/licht/dialogue/act2_licht_sense.md` |
+| Licht senses something abnormal | Licht | Team Member B | `npc/licht/dialogue/act2_licht_sense_zh.md` / `act2_licht_sense_en.md` |
 | Three-person meeting | All | You (Coordinator) | Write in main framework |
-| The shadow of the Gourmet Association | Yu/Huan | Team Member A+C | `npc/{yu,huan}/dialogue/act2_association.md` |
+| The shadow of the Gourmet Association | Yu/Huan | Team Member A+C | ⬜ To be created |
 | Player's choice | All | You (Coordinator) | Write in main framework |
 
 ---

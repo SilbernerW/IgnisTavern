@@ -82,9 +82,9 @@
 |------|---------|--------|---------|
 | 焕坦白过去 | 焕 | 组员 C | `npc/huan/dialogue/act2_revelation.md` |
 | 雨得知真相后的反应 | 雨 | 组员 A | `npc/yu/dialogue/act2_yu_reaction.md` |
-| 利希特感知到异常 | 利希特 | 组员 B | `npc/licht/dialogue/act2_licht_sense.md` |
+| 利希特感知到异常 | 利希特 | 组员 B | `npc/licht/dialogue/act2_licht_sense_zh.md` / `act2_licht_sense_en.md` |
 | 三人会议 | 全体 | 你（统筹）| 写在主框架里 |
-| 美食协会的阴影 | 雨/焕 | 组员 A+C | `npc/{yu,huan}/dialogue/act2_association.md` |
+| 美食协会的阴影 | 雨/焕 | 组员 A+C | ⬜ 待创建 |
 | 玩家的选择 | 全体 | 你（统筹）| 写在主框架里 |
 
 ---

@@ -144,7 +144,7 @@ Language → Character Creation → Act I Management → Qualification
 | `src/rules/` | 游戏规则（d20 检定、属性、职业等） |
 | `src/scenes/` | 各场景脚本（开场、经营、资格确认等） |
 | `src/scenes/shared/` | Act II/III 共享场景文件 |
-| `src/npc/` | NPC 深度对话和背景文件（开发中） |
+| `src/npc/` | NPC 深度对话和背景文件（Act II 对话已完成） |
 | `assets/` | 预留：图像生成模板 |
 | `scripts/` | 预留：辅助脚本 |
 

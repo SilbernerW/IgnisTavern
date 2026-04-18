@@ -228,7 +228,7 @@ Briefly confirm the character's name and template/attributes. Keep backstory vag
 2. Player enters → encounters all three characters simultaneously
    - Yu: in the kitchen, sharp-tongued and wary
    - Huan: in the corner, silent observer with glowing golden eyes
-   - Licht: on the windowsill, waiting for fish
+   - Licht: on the windowsill, clutching its fish bag, waiting to see if you're worth sharing space with
 3. Player responds to the three characters → their reactions
 4. Yu explains the tavern's situation → the three conditions for the Festival
 5. Phase objective revealed
