@@ -49,6 +49,22 @@ Players can choose investigation paths (multiple selections possible, affecting 
 - **Critical Success (≥18)**: Find a hand-drawn map marking "Old Grey Spring"—Huan's hometown
 - **Failure**: Kindly "escorted" out by the archivist who says: "Some history is best left to professionals."
 
+**Huan's Comment** (if present):
+
+He stares at the hand-drawn map, fingers trembling slightly: "...Old Grey Spring. They didn't even keep the name. Just 'old.'"
+
+He looks up, eyes hollow but burning with something: "...If this is the truth, then what was my suffering all these years? Residue of fuel?"
+
+He carefully folds the map, voice low: "...I want to know everything. Not just Grey Spring, but before. All of it."
+
+**Licht's Comment** (if present):
+
+"...137 years," the holy sword in his fish bag hums uneasily, "my people remember this cycle. But we thought... it was legend."
+
+He rarely skips the quips, voice carrying ancient weight: "...This isn't ordinary magic. It's a 'blood pact.' An ancient trade of souls for prosperity."
+
+He looks out the window: "...The Supreme Goddess wouldn't allow this. If this pact truly exists, then either she doesn't know... or she's no longer with us."
+
 **Yu's Comment**:
 
 "...So every 137 years, this city 'reconstructs'? Sounds like some kind of..." She trails off, face pale. "...Just note it down. Don't jump to conclusions yet."
@@ -65,6 +81,22 @@ Players can choose investigation paths (multiple selections possible, affecting 
 - **Success**: Merchant reveals "Sacred Flame" is not a blessing but "fuel"—the city's prosperity comes from "something burning"
 - **Critical Success (≥18)**: Obtain a "Sacred Flame fragment"—touching it reveals faint wailing sounds
 - **Failure**: Merchant suddenly clams up, saying "This topic isn't for surface discussion," and hurries away
+
+**Licht's Comment** (as guide, he must be present):
+
+He takes the fragment with his fin, the holy sword's light suddenly dimming: "...Hear that? Wailing. These souls... they're still inside."
+
+His voice rarely serious, devoid of usual jest: "...This isn't ordinary fire. It's 'soul-prison flame.' Trapping the dead in eternal burning, never ceasing."
+
+He returns the fragment, fish bag trembling slightly: "...My holy sword can sense suffering. These souls... have been burning for centuries. They want release, but the contract won't allow it."
+
+**Huan's Comment** (if present):
+
+The moment he touches the fragment, his left-hand flame dances wildly, face pale: "...This feeling. Just like Grey Spring's final day. The taste in the air... it's souls burning."
+
+He steps back, voice breaking: "...My family... are they in here too? Burning in some fragment?"
+
+He grabs your arm with surprising strength: "...We need to find the source. Not tomorrow. Now."
 
 **Yu's Comment**:
 
@@ -84,6 +116,22 @@ She looks at the fragment, hands trembling slightly, but voice still sharp: "...
 - **Success**: Notice "faces" in the flame's light—fleeting expressions of pain
 - **Critical Success (≥18)**: Hear whispers repeating "Save me" and "137 years"
 - **Failure**: Only perceive the Sacred Flame as magnificent, the city's pride
+
+**Huan's Comment** (as observer, he must be present):
+
+His left-hand flame resonates with the Sacred Flame, face unusually pale in the red light: "...They're calling me. Those faces... they recognize what's inside me."
+
+He closes his eyes, voice pained: "...The people of Grey Spring. I can feel them. They're still inside... still burning."
+
+He suddenly opens his eyes, filled with determination: "...I'm going to save them. Whatever the contract says, whether 137 years or 1000. I'm going to let them rest."
+
+**Licht's Comment** (if present):
+
+"...Whispers," his voice rarely tense, "'Save me.' 137 years. This is no coincidence."
+
+The holy sword in his fish bag shakes violently: "...This is a distress signal. Trapped souls using gaps in the contract... to send messages to the outside world."
+
+He looks at Huan: "...You can hear them, right? Your flame shares their source. You are... their hope."
 
 **Yu's Comment**:
 

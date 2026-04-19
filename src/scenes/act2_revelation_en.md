@@ -49,6 +49,22 @@ His voice shatters: "They're burning souls. Every 137 years, burning a village, 
 - **Critical Success (≥18)**: Find older tags, earliest dating to "First Era, Year of Sacred Flame, 1000 people"—a millennium-old contract
 - **Failure**: Only feel nausea and fear, unable to examine closely
 
+**Huan's Reaction** (he must be present):
+
+He kneels before the bone piles, left-hand flame resonating with the array, tears flowing silently: "...347 people. I knew... at least half of them. Neighbors, teachers, friends..."
+
+He picks up a tag, fingers trembling: "...They even have numbers. Not names, numbers. Like... like inventory."
+
+He suddenly stands up, flame gathering in his hand: "...I'm going to burn this place. All of it. To hell with the contract."
+
+**Licht's Comment**:
+
+He touches the array's edge with his fish bag, the holy sword emitting a piercing alarm: "...Wait. This structure... it's not simple imprisonment."
+
+His voice grows urgent: "...It's a 'cycle.' The energy produced by burning souls doesn't just maintain the Sacred Flame... it's replicating itself. Every cycle, the contract grows stronger."
+
+He points to the empty space at the array's center: "...Next cycle is Ignis. But the cycle after that? Could be the entire continent. This contract... it's growing."
+
 **Yu's Reaction**:
 
 She stands before the bone piles, body rigid. Then, slowly, she crouches down, picking up a tag.
@@ -72,6 +88,16 @@ She looks at the array's center—there's an empty slot labeled "Next Cycle: Ign
 He spreads his arms: "The Sacred Flame requires fuel. This is the ancient contract. Approved by the Supreme Goddess herself."
 
 **Huan** roars: "That's not a contract! That's murder!"
+
+His body trembles, left-hand flame dancing out of control: "...My family isn't fuel! They're people! With names, stories, and..."
+
+He can't continue, just staring at the Flame Keeper with pure hatred: "...You'll pay. All of you will pay."
+
+**Licht's** voice emerges from the fish bag, rarely cold:
+
+"...Ancient contract, you say? Approved by the Supreme Goddess, you say?" His quip carries killing intent, "...Do you know what holy swords are for? Chopping up exactly this kind of 'ancient contract.'"
+
+The light in his fish bag grows brighter: "...My previous master also encountered a similar 'contract.' You know what happened? The contract shattered, and that god... shattered too."
 
 **The Flame Keeper** sneers: "Murder? This is sacrifice. For the prosperity of millions, what's the sacrifice of a few hundred?"
 
