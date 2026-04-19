@@ -34,20 +34,62 @@ She slaps the letter on the table, lowering her voice: "But doesn't it seem stra
 
 ---
 
-## Investigation Branches
+## Investigation Branches: Player Choices
 
-Players can choose investigation paths (multiple selections possible, affecting subsequent clues):
+**Yu looks at the invitation, proposing three investigation directions:**
+
+"...We can't blindly rush into the Culinary Competition. We need to figure out why this invitation chose us first."
+
+She points to three marks on the map: "Three places might hide answers. We need to pick one to start."
+
+### Player Choice
+
+**Choice A: Archives** — "History doesn't lie. If this city has secrets, the archives will bear traces." (Huan proposes)
+- Advantage: Huan's intelligence bonus, may discover map clues
+- Risk: Official location, easy to attract attention
+
+**Choice B: Underground Black Market** — "Fish have their channels. Information too." (Licht leads)
+- Advantage: Licht's connections, may obtain Sacred Flame fragment
+- Risk: Black market danger, possible ambush
+
+**Choice C: Sacred Flame Plaza** — "Go directly look at that flame. If it really has problems, I can feel it." (Huan insists)
+- Advantage: Huan's flame resonance, may hear soul whispers
+- Risk: Plaza has guards, high exposure risk
+
+---
+
+**AI DM Prompt**: Players can:
+1. **Choose single route** (quick but limited clues)
+2. **Split up** (efficient but dangerous, requires separate checks)
+3. **Investigate multiple routes in sequence** (comprehensive but time-consuming, may miss competition prep time)
+
+**Time Limit**: Culinary Competition in 3 days. Each route consumes 1 day.
+
+---
+
+## Investigation Execution and Checks
 
 ### Branch A: Archives Investigation
 
 **Location**: Ignis City Archives
 
+**Entry Method Choice**:
+- **Option 1**: Normal application to browse (Charisma DC 10, failure politely declined)
+- **Option 2**: Sneak into archives after closing (Agility DC 14, failure triggers alarm)
+- **Option 3**: Bribe the archivist (requires 50 gold, automatic success but leaves leverage)
+
 **Huan** suggests: "If this city has secrets, the archives will bear traces."
 
-**Check**: Intelligence DC 12 (Search historical records)
-- **Success**: Discover records from 137 years ago systematically "lost"—every 137 years there's a "city reconstruction"
+**Core Check**: Intelligence DC 12 (Search historical records)
+- **Success (≥12)**: Discover records from 137 years ago systematically "lost"
+  - Additional discovery: Every 137 years there's a "city reconstruction" record
+  - **Follow-up clue**: Can question archivist, Charisma DC 14 check, success grants "Old City District Map"
 - **Critical Success (≥18)**: Find a hand-drawn map marking "Old Grey Spring"—Huan's hometown
-- **Failure**: Kindly "escorted" out by the archivist who says: "Some history is best left to professionals."
+  - **Huan's reaction**: Gains emotional clue, subsequent Huan interactions +2 bonus
+  - **Special discovery**: Map back has note "Next Cycle: Ignis"
+- **Failure (<12)**: Kindly "escorted" out by the archivist
+  - **Consequence**: Route closed, cannot retry
+  - **Recovery**: Can choose other two routes, or attempt night infiltration (Agility DC 16)
 
 **Huan's Comment** (if present):
 
@@ -75,12 +117,24 @@ He looks out the window: "...The Supreme Goddess wouldn't allow this. If this pa
 
 **Location**: Ignis Underground Black Market
 
-**Licht** leads the way: "...Fish have their channels. Information too."
+**Entry Method**: Licht leads (automatic success, but Licht demands sharing one "interesting story" as payment)
 
-**Check**: Charisma DC 14 (Negotiate with black market merchants)
-- **Success**: Merchant reveals "Sacred Flame" is not a blessing but "fuel"—the city's prosperity comes from "something burning"
-- **Critical Success (≥18)**: Obtain a "Sacred Flame fragment"—touching it reveals faint wailing sounds
-- **Failure**: Merchant suddenly clams up, saying "This topic isn't for surface discussion," and hurries away
+**Information Gathering Method Choice**:
+- **Option 1**: Directly ask about Sacred Flame (Charisma DC 14, merchant may become suspicious)
+- **Option 2**: Buy intel first then probe (requires 30 gold, Charisma DC 10)
+- **Option 3**: Licht uses holy sword intimidation (automatic intel gain, but attracts black market attention, may be tracked later)
+
+**Core Check**: Charisma DC 14 (Negotiate with black market merchants)
+- **Success (≥14)**: Merchant reveals "Sacred Flame" is not a blessing but "fuel"
+  - **Key intel**: City prosperity comes from "something burning"
+  - **Merchant warning**: "This topic isn't for surface discussion"
+  - **Follow-up choice**: Can probe deeper (Charisma DC 16), success grants merchant's name, can contact later
+- **Critical Success (≥18)**: Obtain a "Sacred Flame fragment"
+  - **Special item**: Touching reveals faint wailing sounds (subsequent revelation scene +2 perception bonus)
+  - **Hidden clue**: Fragment has runes, Licht can decipher (Intelligence DC 12)
+- **Failure (<14)**: Merchant suddenly clams up
+  - **Consequence**: Merchant hurries away, route closed for the day
+  - **Recovery**: Can track merchant (Agility DC 13), success discovers his supplier
 
 **Licht's Comment** (as guide, he must be present):
 
@@ -108,14 +162,26 @@ She looks at the fragment, hands trembling slightly, but voice still sharp: "...
 
 **Location**: Sacred Flame Plaza (Daytime)
 
+**Observation Method Choice**:
+- **Option 1**: Long-distance observation (safe, Perception DC 13)
+- **Option 2**: Blend into pilgrim crowd for close observation (Perception DC 10, but Charisma DC 12 disguise, either failure attracts attention)
+- **Option 3**: Huan directly releases flame resonance (automatic success, but Huan suffers emotional shock, requires Constitution DC 12 check to prevent失控)
+
 **Huan** stands at the plaza's edge, left-hand flame dancing wildly:
 
 "...It's calling me. No, calling what's inside me."
 
-**Check**: Perception DC 13 (Observe the Sacred Flame)
-- **Success**: Notice "faces" in the flame's light—fleeting expressions of pain
+**Core Check**: Perception DC 13 (Observe the Sacred Flame)
+- **Success (≥13)**: Notice "faces" in the flame's light—fleeting expressions of pain
+  - **Huan's resonance**: Huan confirms these are Grey Spring souls
+  - **Follow-up choice**: Can continue observing (Perception DC 15), success discovers faces appear in regular patterns
 - **Critical Success (≥18)**: Hear whispers repeating "Save me" and "137 years"
-- **Failure**: Only perceive the Sacred Flame as magnificent, the city's pride
+  - **Key intel**: Confirms 137-year cycle relates to souls
+  - **Special effect**: Huan gains "Soul Resonance" status, subsequent soul-related checks +2
+  - **Risk**: Huan emotionally unstable, requires Wisdom DC 10 check to stay calm, failure causes on-site outburst (attracts guards)
+- **Failure (<13)**: Only perceive the Sacred Flame as magnificent, the city's pride
+  - **Consequence**: Miss key clues
+  - **Recovery**: Can ask elderly plaza pilgrims (Charisma DC 11), success hears "137-year cycle" folk legend
 
 **Huan's Comment** (as observer, he must be present):
 

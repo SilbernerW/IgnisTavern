@@ -44,10 +44,40 @@ His voice shatters: "They're burning souls. Every 137 years, burning a village, 
 
 ### Discovery Among the Bones
 
-**Check**: Perception DC 14 (Examine the bones)
-- **Success**: Discover tags on the bones—dates, locations, numbers. The most recent reads "Grey Spring, 137 years ago, 347 people"
+**Player Action Choice**:
+
+Facing the bone piles, you can choose:
+
+**Option A: Carefully examine bone tags** (Perception DC 14)
+- Goal: Confirm victim identities and numbers
+- Risk: Mental shock, may require Wisdom DC 12 check to maintain sanity
+
+**Option B: Search for array structure weaknesses** (Intelligence DC 16)
+- Goal: Find way to break the contract
+- Advantage: If successful, Act III gains "Array Knowledge" bonus
+- Risk: Time-consuming, may be discovered by Flame Keeper early
+
+**Option C: Comfort Huan** (Charisma DC 12)
+- Goal: Prevent Huan's emotional breakdown
+- Effect: Huan gains "Determined" status, subsequent checks +1
+- Failure: Huan失控 attacks array, triggers Flame Keeper early appearance
+
+**Option D: Let Licht probe with holy sword** (Automatic success)
+- Effect: Licht gains contract structure information
+- Cost: Holy sword light exposes position, Flame Keeper immediately discovers you
+
+---
+
+**Core Check**: Perception DC 14 (Examine the bones)
+- **Success (≥14)**: Discover tags on the bones—dates, locations, numbers. The most recent reads "Grey Spring, 137 years ago, 347 people"
+  - **Additional discovery**: Each tag has a number, not a name
+  - **Follow-up**: Can comfort Huan (Charisma DC 12), success prevents his失控
 - **Critical Success (≥18)**: Find older tags, earliest dating to "First Era, Year of Sacred Flame, 1000 people"—a millennium-old contract
-- **Failure**: Only feel nausea and fear, unable to examine closely
+  - **Key discovery**: Contract has been growing—each cycle sacrifices more souls
+  - **Special clue**: Empty slot labeled "Next Cycle: Ignis"
+- **Failure (<14)**: Only feel nausea and fear, unable to examine closely
+  - **Consequence**: Miss critical clues
+  - **Recovery**: Yu automatically finds one tag, but you miss the bigger picture
 
 **Huan's Reaction** (he must be present):
 
@@ -105,21 +135,54 @@ He looks at Huan: "Your Grey Spring was glorious. Their souls became part of the
 
 ---
 
-### Dialogue Options
+### Flame Keeper Confrontation: Player Choices
 
-Players choose how to respond to the Flame Keeper:
+**The Flame Keeper** emerges from shadows, clad in fiery robes, face hidden by a mask.
 
-**Option A: Angry Condemnation**
-- "This isn't sacrifice, it's murder! You've deceived everyone!"
+"Clever little mice," his voice magically processed, hollow and imposing, "you've discovered the city's foundation."
+
+**Round 1: Response Method Choice**
+
+**Option A: Angry Confrontation** (Requires Constitution DC 12 to suppress fear)
+- Effect: Flame Keeper responds contemptuously, but exposes his arrogant nature
+- Follow-up: Can taunt him with Charisma check (DC 14), success grants "Flame Keeper Weakness" clue
+- Risk: Angering Flame Keeper may trigger early combat
+
+**Option B: Calm Negotiation** (Requires Intelligence DC 14 to organize words)
+- Effect: Flame Keeper willing to talk, reveals "contract cannot be changed" information
+- Follow-up: Can search for logical flaws with Wisdom DC 16, success discovers "contract requires consent" hidden clause
+- Advantage: Paves way for Act III "Find Third Way" option
+
+**Option C: Silent Observation** (Perception DC 13 to observe array)
+- Effect: Flame Keeper talks to himself, but you can observe the array
+- Follow-up: Discover "anchor" runes at array edge (Yu will hint)
+- Special: If Licht present, automatically discovers "contract is growing" key information
+
+**Option D: Direct Attack** (Requires Agility DC 16 for surprise attack)
+- Effect: Flame Keeper easily blocks, but exposes his physical position
+- Consequence: Immediately enter combat or escape判定
+- Follow-up: Act III "Stop Ceremony" route opens, but difficulty increases
+
+---
+
+### Dialogue Options (Detailed Checks)
+
+**Choose Option A: Angry Condemnation**
+- Line: "This isn't sacrifice, it's murder! You've deceived everyone!"
+- **Charisma Check DC 12**: Success causes Flame Keeper brief silence, exposing unease; failure makes him more arrogant
 - Flame Keeper responds: "Citizens don't need the truth. They only need prosperity."
 
-**Option B: Calm Negotiation**
-- "If the truth is exposed, the city will collapse. You need a new solution."
+**Choose Option B: Calm Negotiation**
+- Line: "If the truth is exposed, the city will collapse. You need a new solution."
+- **Intelligence Check DC 14**: Success makes Flame Keeper admit "interesting proposal"; failure makes him think you're bluffing
 - Flame Keeper responds: "Interesting proposal. But the contract is signed and cannot be changed."
+- **Probe Check DC 16**: "Under what conditions can it be changed?" Success grants "contract requires mutual consent" key information
 
-**Option C: Silent Observation**
-- Say nothing, continue studying the array's structure
+**Choose Option C: Silent Observation**
+- Action: Say nothing, continue studying the array's structure
+- **Perception Check DC 13**: Success notices array edge rune anomalies; Critical Success (≥18) directly discovers "anchor" location
 - Flame Keeper: "Looking for flaws? The contract is perfect. For 137 years, it has never failed."
+- **Yu Reaction Check DC 10**: She notices what you observed,主动提示 "anchor" information
 
 **Yu's Reaction** (regardless of choice):
 
