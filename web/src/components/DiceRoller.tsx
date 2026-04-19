@@ -5,16 +5,18 @@ import { useState, useCallback } from 'react';
 interface DiceRollerProps {
   onRoll?: (result: number) => void;
   disabled?: boolean;
+  locked?: boolean;
   difficulty?: number;
+  checkLabel?: string;
 }
 
-export default function DiceRoller({ onRoll, disabled = false, difficulty }: DiceRollerProps) {
+export default function DiceRoller({ onRoll, disabled = false, locked = false, difficulty, checkLabel }: DiceRollerProps) {
   const [isRolling, setIsRolling] = useState(false);
   const [result, setResult] = useState<number | null>(null);
   const [displayNumber, setDisplayNumber] = useState(1);
 
   const rollDice = useCallback(() => {
-    if (isRolling || disabled) return;
+    if (isRolling || disabled || locked) return;
 
     setIsRolling(true);
     setResult(null);
@@ -64,8 +66,28 @@ export default function DiceRoller({ onRoll, disabled = false, difficulty }: Dic
     return result >= difficulty ? '成功!' : '失败';
   };
 
+  const isInteractive = !locked && !disabled && !isRolling;
+
   return (
     <div className="flex flex-col items-center gap-4">
+      {/* Locked overlay */}
+      {locked && (
+        <div className="text-center mb-1">
+          <div className="text-xs text-slate-500/70 italic">
+            {checkLabel ? `🔒 ${checkLabel}` : '🔒 等待DM指示投骰'}
+          </div>
+        </div>
+      )}
+
+      {/* Unlocked glow banner */}
+      {!locked && difficulty !== undefined && (
+        <div className="text-center mb-1 animate-pulse">
+          <div className="text-sm text-amber-300 font-bold">
+            🎲 {checkLabel || '检定'} DC {difficulty}
+          </div>
+        </div>
+      )}
+
       {/* Dice display */}
       <div className="relative">
         {/* Glow effect */}
@@ -80,11 +102,12 @@ export default function DiceRoller({ onRoll, disabled = false, difficulty }: Dic
         <div className={`
           relative w-24 h-24 md:w-28 md:h-28
           bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900
-          border-2 border-amber-700/50 rounded-xl
+          border-2 rounded-xl
           flex items-center justify-center
           shadow-xl
-          transition-transform duration-150
-          ${isRolling ? 'scale-95' : 'scale-100'}
+          transition-all duration-300
+          ${locked ? 'border-slate-600/30 opacity-50' : 'border-amber-700/50'}
+          ${isRolling ? 'scale-95' : isInteractive ? 'hover:scale-105 cursor-pointer' : 'scale-100'}
         `}>
           {/* Inner bevel */}
           <div className="absolute inset-1 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900" />
@@ -93,10 +116,10 @@ export default function DiceRoller({ onRoll, disabled = false, difficulty }: Dic
           <span className={`
             relative z-10 text-5xl md:text-6xl font-bold font-medieval
             transition-all duration-300
-            ${getResultColor() || 'text-amber-100'}
+            ${locked ? 'text-slate-600' : (getResultColor() || 'text-amber-100')}
             ${isRolling ? 'scale-110' : 'scale-100'}
           `}>
-            {displayNumber}
+            {locked ? '🔒' : displayNumber}
           </span>
 
           {/* Corner decorations */}
@@ -136,22 +159,22 @@ export default function DiceRoller({ onRoll, disabled = false, difficulty }: Dic
       {/* Roll button */}
       <button
         onClick={rollDice}
-        disabled={isRolling || disabled}
+        disabled={isRolling || disabled || locked}
         className={`
           relative px-6 py-3 font-medieval font-bold
           rounded-lg overflow-hidden
           transition-all duration-200
-          ${isRolling || disabled 
+          ${isRolling || disabled || locked
             ? 'bg-slate-700 text-slate-500 cursor-not-allowed' 
-            : 'bg-gradient-to-r from-amber-700 to-orange-600 text-white hover:from-amber-600 hover:to-orange-500 hover:scale-105 active:scale-95 shadow-lg shadow-orange-900/30'}
+            : 'bg-gradient-to-r from-amber-700 to-orange-600 text-white hover:from-amber-600 hover:to-orange-500 hover:scale-105 active:scale-95 shadow-lg shadow-orange-900/30 animate-pulse'}
         `}
       >
         {/* Button glow */}
-        {!isRolling && !disabled && (
+        {!isRolling && !disabled && !locked && (
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:animate-shimmer" />
         )}
         <span className="relative z-10">
-          {isRolling ? '投掷中...' : '掷骰子'}
+          {locked ? '🔒 等待检定' : isRolling ? '投掷中...' : difficulty ? `🎲 掷骰 (DC${difficulty})` : '掷骰子'}
         </span>
       </button>
     </div>

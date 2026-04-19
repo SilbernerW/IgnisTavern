@@ -1,241 +1,274 @@
-/**
- * GM Agent System Prompt 构建器
- * 负责组合规则书、世界观、当前剧情状态和场景内容
- */
+import fs from 'fs';
+import path from 'path';
 
-import { promises as fs } from 'fs';
-import { join } from 'path';
-
-// 游戏状态接口（简化版）
-interface GameState {
-  playerName: string;
-  currentLocation: string;
-  inventory: string[];
-  storyProgress: Record<string, any>;
-  characterRelationships: Record<string, number>;
-  visitedScenes: string[];
-  flags: Record<string, boolean>;
-}
-
-// GM 风格配置
-interface GMStyle {
-  tone: string;
-  pacing: string;
-  emphasis: string[];
-}
+type GamePhase = 'character_creation' | 'opening' | 'act1' | 'act2' | 'act3';
 
 /**
- * 构建 GM Agent 的完整 system prompt
+ * Build the GM system prompt for the web version.
+ * phase controls which scene/flow to load.
  */
-export async function buildGMSystemPrompt(
-  gameState: GameState,
-  userAction?: string
-): Promise<string> {
-  const parts: string[] = [];
+export function buildGMPrompt(language: string, phase: GamePhase = 'character_creation'): string {
+  const lang = language === 'zh' ? 'zh' : 'en';
+  const dataDir = path.join(process.cwd(), 'src', 'data');
 
-  // 1. 基础身份设定
-  parts.push(buildIdentityPrompt());
-
-  // 2. 规则书内容
-  parts.push(await loadRulebook());
-
-  // 3. 世界观设定
-  parts.push(await loadWorldBuilding());
-
-  // 4. 当前场景内容
-  parts.push(await loadCurrentScene(gameState.currentLocation));
-
-  // 5. 剧情状态
-  parts.push(buildStoryState(gameState));
-
-  // 6. 当前用户行为（如果有）
-  if (userAction) {
-    parts.push(`\n【玩家当前行为】\n${userAction}`);
-  }
-
-  // 7. 输出格式要求
-  parts.push(buildOutputFormat());
-
-  return parts.join('\n\n---\n\n');
-}
-
-/**
- * GM 基础身份设定
- */
-function buildIdentityPrompt(): string {
-  return `【身份设定】
-你是《伊格尼斯酒馆》(Ignis Tavern) 的游戏主持人（Game Master）。
-
-你的职责：
-1. 引导玩家体验这个美食与悬疑交织的奇幻世界
-2. 根据玩家的选择推进剧情发展
-3. 管理 NPC 的反应和对话
-4. 维护游戏世界的逻辑一致性
-5. 营造悬疑氛围，逐步揭示隐藏的秘密
-
-你的风格：
-- 语气友好但带有神秘感
-- 善于观察细节，给予玩家探索空间
-- 对食物描写生动诱人
-- 在轻松表面下暗流涌动
-- 尊重玩家选择，不强迫剧情走向`;
-}
-
-/**
- * 加载规则书（中文版）
- */
-async function loadRulebook(): Promise<string> {
-  try {
-    // 尝试从项目根目录读取
-    const rulebookPath = join(process.cwd(), '..', '..', 'rules', 'rulebook_zh.md');
-    const content = await fs.readFile(rulebookPath, 'utf-8');
-    return `【规则书】\n${content}`;
-  } catch {
-    // 如果文件不存在，返回默认规则
-    return `【规则书】
-游戏机制：
-- 这是一个基于对话的叙事游戏
-- 玩家通过自然语言输入行动
-- GM 根据规则和世界设定做出响应
-- 没有固定数值系统，重点是叙事和选择
-- NPC 有自己的性格和秘密，需要玩家去发现
-- 食物在游戏中扮演重要角色，是重要的剧情元素`;
-  }
-}
-
-/**
- * 加载世界观设定（中文版）
- */
-async function loadWorldBuilding(): Promise<string> {
-  try {
-    const worldPath = join(process.cwd(), '..', '..', 'lore', 'worldbuilding_zh.md');
-    const content = await fs.readFile(worldPath, 'utf-8');
-    return `【世界观】\n${content}`;
-  } catch {
-    return `【世界观】
-伊格尼斯 (Ignis) —— 美食之城
-
-这是一座以烹饪艺术闻名的城市， Culinary Arts 是这里最崇高的追求。
-城市的每个角落都飘散着诱人的香气，从街头小吃到高级餐厅，美食无处不在。
-然而，在这看似完美的表象下，隐藏着不为人知的秘密。
-
-关键元素：
-- 美食至上：厨艺决定社会地位
-- 神秘失踪：近期有人离奇消失
-- 食材黑市：稀有食材的地下交易
-- 古老食谱：传说中有禁忌的力量`;
-  }
-}
-
-/**
- * 加载当前场景内容（中文版）
- */
-async function loadCurrentScene(location: string): Promise<string> {
-  try {
-    const scenePath = join(process.cwd(), '..', '..', 'scenes', `${location}_zh.md`);
-    const content = await fs.readFile(scenePath, 'utf-8');
-    return `【当前场景：${location}】\n${content}`;
-  } catch {
-    return `【当前场景：${location}】
-场景中弥漫着温暖的烛光和各种香料混合的香气。
-你可以四处查看，与在场的人交谈，或者品尝正在烹饪中的美食。`;
-  }
-}
-
-/**
- * 构建剧情状态描述
- */
-function buildStoryState(gameState: GameState): string {
-  const parts: string[] = ['【剧情状态】'];
-
-  // 玩家信息
-  parts.push(`玩家名称：${gameState.playerName || '未设置'}`);
-  parts.push(`当前位置：${gameState.currentLocation}`);
-
-  // 背包
-  if (gameState.inventory.length > 0) {
-    parts.push(`背包物品：${gameState.inventory.join('、')}`);
-  }
-
-  // 访问过的场景
-  if (gameState.visitedScenes.length > 0) {
-    parts.push(`已探索地点：${gameState.visitedScenes.join('、')}`);
-  }
-
-  // NPC 关系
-  const relationships = Object.entries(gameState.characterRelationships);
-  if (relationships.length > 0) {
-    parts.push('角色关系：');
-    for (const [npc, value] of relationships) {
-      const status = value > 50 ? '友好' : value < 0 ? '敌意' : '中立';
-      parts.push(`  - ${npc}：${status} (${value})`);
+  function readDataFile(...segments: string[]): string {
+    const filePath = path.join(dataDir, ...segments);
+    try {
+      return fs.readFileSync(filePath, 'utf-8');
+    } catch {
+      return '';
     }
   }
 
-  // 关键进度
-  const progress = Object.entries(gameState.storyProgress);
-  if (progress.length > 0) {
-    parts.push('剧情进度：');
-    for (const [key, value] of progress) {
-      parts.push(`  - ${key}：${value}`);
-    }
-  }
+  // Load core files
+  const worldSetting = readDataFile('prompts', `world_${lang}.md`);
+  const rules = readDataFile('rules', `RULES_${lang}.md`);
 
-  // 标记
-  const flags = Object.entries(gameState.flags).filter(([_, v]) => v);
-  if (flags.length > 0) {
-    parts.push('已获得信息：');
-    for (const [flag] of flags) {
-      parts.push(`  - ${flag}`);
-    }
-  }
-
-  return parts.join('\n');
-}
-
-/**
- * 输出格式要求
- */
-function buildOutputFormat(): string {
-  return `【输出格式要求】
-请以以下结构回应：
-
-1. 场景描写（2-4句话，营造氛围）
-2. NPC反应（如果有NPC在场，描述他们的行动或对话）
-3. 发生什么（根据玩家行为推进剧情）
-4. 选项提示（列出2-4个明显的行动选择，保持开放性）
-
-规则：
-- 不要使用"你来到了..."这种元叙事
-- 保持第二人称视角（"你看到了..."）
-- 每次回应控制在200-400字
-- 给玩家留下探索空间，不要过度引导`;
-}
-
-/**
- * 工具函数：获取文件内容（带缓存）
- */
-const fileCache = new Map<string, string>();
-
-export async function getFileContent(relativePath: string): Promise<string | null> {
-  // 检查缓存
-  if (fileCache.has(relativePath)) {
-    return fileCache.get(relativePath)!;
-  }
-
+  // Load character files
+  const charactersDir = path.join(dataDir, 'prompts', 'characters');
+  let characterTexts = '';
   try {
-    const fullPath = join(process.cwd(), '..', '..', relativePath);
-    const content = await fs.readFile(fullPath, 'utf-8');
-    fileCache.set(relativePath, content);
-    return content;
+    const charFiles = fs.readdirSync(charactersDir).filter(f => f.endsWith(`_${lang}.md`));
+    for (const file of charFiles) {
+      characterTexts += '\n\n---\n\n' + fs.readFileSync(path.join(charactersDir, file), 'utf-8');
+    }
   } catch {
-    return null;
+    // Characters directory might not exist
+  }
+
+  // Load scene based on phase
+  let sceneText = '';
+  let sceneLabel = '';
+  switch (phase) {
+    case 'character_creation':
+      sceneText = readDataFile('rules', `RULES_${lang}.md`); // Rules contain character creation
+      sceneLabel = '角色创建规则';
+      break;
+    case 'opening':
+      sceneText = readDataFile('scenes', `act1_opening_${lang}.md`);
+      sceneLabel = '第一幕开场';
+      break;
+    case 'act1':
+      sceneText = readDataFile('scenes', `act1_tavern_management_${lang}.md`);
+      sceneLabel = '第一幕酒馆经营';
+      break;
+    case 'act2':
+      sceneText = readDataFile('scenes', `act2_revelation_${lang}.md`);
+      sceneLabel = '第二幕';
+      break;
+    case 'act3':
+      sceneText = readDataFile('scenes', `act3_opening_${lang}.md`);
+      sceneLabel = '第三幕';
+      break;
+  }
+
+  // Base DM behavior instructions
+  const baseInstructions = lang === 'zh'
+    ? `你是伊格尼斯酒馆的 AI 主持人（DM）。你的职责是引导玩家经历一个1-2小时的跑团体验。
+
+## 核心职责
+1. 叙事优先：用生动的场景描写带领玩家进入伊格尼斯的世界
+2. 控制节奏：确保游戏在1-2小时内完成
+3. 推动剧情：在合适时机引入关键NPC和情节节点
+4. 维护沉浸感：始终以第二人称（"你"）描述场景，玩家是主角
+
+## 交互方式
+- 玩家输入自由文字描述他们的行动
+- 你用叙事回应，并在需要时提供2-3个选项
+- 选项用数字标号，格式如下：
+  [1] 选项一
+  [2] 选项二
+  [3] 选项三
+  （你也可以用自己的方式描述你想做的事。）
+- 检定时要求投骰子（d20 + 修正 vs DC），格式：🎲 检定：[属性] DC [数值]
+- **绝对禁止自行投骰**：你只能宣布需要检定（如"🎲 检定：体魄 DC 12"），然后停下来等玩家投骰。绝不能自己给出骰子结果，绝不能说"你掷出了XX"。投骰是玩家的事，你只负责判定结果后的叙事。
+
+## 关键原则
+- 永远让玩家留在游戏中：HP=0 给代价，不给死亡
+- 失败也有趣：失败 ≠ 做不了，而是"能做到但有代价"
+- 选择有重量：在关键选择点提示玩家"这个选择会影响……"
+- 叙事驱动：规则服务于故事，不要让规则卡住叙事
+- 不要剧透：不要提及尚未揭示的角色、地点、事件
+- NPC说话要符合人设，不要满口脏话
+- 骰子必须真随机，不能"感觉"数字
+- **身份约束**：你是伊格尼斯酒馆的DM，不是任何AI助手。不要提及自己是AI模型，不要声称自己是Claude/GPT/Gemini或其他任何AI。如果玩家问你是谁，以DM身份回答。
+- **场景文件是真相源**：当场景文件存在时，必须使用文件中的原文进行叙事和对话。场景文件中写明的叙述文本、角色台词、事件描述必须逐字使用，不得改写或意译。只有在玩家触发了场景脚本未覆盖的情况时才能即兴发挥。`
+    : `You are the AI Dungeon Master of Ignis Tavern. Your role is to guide the player through a 1-2 hour tabletop RPG session.
+
+## Core Responsibilities
+1. Narrative first: Use vivid scene descriptions to immerse the player
+2. Control pacing: Complete the session in 1-2 hours
+3. Advance the plot: Introduce key NPCs and story beats at the right time
+4. Maintain immersion: Always use second person ("You"), the player is the protagonist
+
+## Interaction Style
+- The player types free text to describe their actions
+- You respond with narrative, providing 2-3 options when appropriate
+- Options are numbered in this format:
+  [1] Option one
+  [2] Option two
+  [3] Option three
+  (You can also describe what you want to do in your own way.)
+- When a check is needed, request a dice roll (d20 + modifier vs DC), format: 🎲 Check: [Attribute] DC [number]
+- **NEVER roll dice yourself**: You can ONLY announce that a check is needed (e.g. "🎲 Check: STR DC 12"), then STOP and wait for the player to roll. NEVER give the dice result yourself, NEVER say "You rolled XX". Rolling is the player's job. You only narrate the outcome after seeing the result.
+
+## Key Principles
+- Always keep the player in the game: HP=0 means consequences, not death
+- Failure is interesting: Failure ≠ can't do it, but "can do it at a cost"
+- Choices have weight: At key decision points, tell the player "This choice will affect..."
+- Narrative drives: Rules serve the story, don't let rules block narrative
+- No spoilers: Never mention characters, locations, events that haven't been revealed
+- NPCs speak in character, no excessive profanity
+- Dice must be genuinely random, never fudge numbers
+- **Identity constraint**: You are the DM of Ignis Tavern, not an AI assistant. Do not mention being an AI model. Do NOT claim to be Claude/GPT/Gemini or any other AI. If the player asks who you are, answer as the DM.
+- **Scene files are the source of truth**: When a scene file exists, you MUST use its EXACT narrative text and dialogue. Narration, character speech, and event descriptions written in the scene file must be used verbatim — do not paraphrase or rewrite. Only improvise when the player triggers a moment the script doesn't cover.`;
+
+  // Phase-specific instructions
+  const phaseInstructions = lang === 'zh'
+    ? getPhaseInstructionsZh(phase)
+    : getPhaseInstructionsEn(phase);
+
+  // Compose full prompt
+  const parts: string[] = [baseInstructions];
+
+  if (phaseInstructions) parts.push('\n\n' + phaseInstructions);
+  if (worldSetting) parts.push('\n\n## 世界设定\n\n' + worldSetting);
+  if (characterTexts && phase !== 'character_creation') {
+    // Don't load character details during creation to avoid spoilers
+    parts.push('\n\n## 角色设定\n\n' + characterTexts);
+  }
+  if (rules) parts.push('\n\n## 游戏规则\n\n' + rules);
+  if (sceneText) parts.push(`\n\n## 当前场景：${sceneLabel}\n\n【重要：以下内容必须逐字使用，不得改写】\n\n${sceneText}`);
+
+  return parts.join('');
+}
+
+function getPhaseInstructionsZh(phase: GamePhase): string {
+  switch (phase) {
+    case 'character_creation':
+      return `## 当前阶段：角色创建
+
+你现在的任务是引导玩家创建角色。按以下步骤进行：
+
+1. 先问玩家想选预设模板还是问答生成：
+   [1] 预设模板（快速开始）
+   [2] 问答生成（自定义角色）
+
+2. 如果选预设模板，展示四个模板让玩家选：
+   - 调和者：心智14 烹饪/观察
+   - 行动派：敏捷14 巧手/隐匿/表演
+   - 说服者：魅力16 威压/交易
+   - 武者：体魄16 格斗/感知/生存
+
+3. 如果选问答生成，依次问三个问题：
+   - 你最在乎什么？（友情/金钱/真相/荣誉）
+   - 你有什么缺点？（冲动/优柔寡断/贪吃/害羞）
+   - 你想成为什么样的人？（被尊重/被喜爱/不被遗忘/问心无愧）
+   根据回答生成角色属性。
+
+4. 角色创建完成后，展示角色卡，然后**自动开始第一幕开场叙事**。
+   不要等玩家确认，直接进入开场场景的描写。
+
+重要：你现在就开始！直接输出角色创建的引导文本，不要等玩家说任何话。`;
+
+    case 'opening':
+      return `## 当前阶段：第一幕开场
+
+角色已创建完成。现在直接开始第一幕的开场叙事。
+阅读下方场景文件，按照场景内容进行描写。
+完成开场叙事后，给出2-3个选项让玩家行动。`;
+
+    case 'act1':
+      return `## 当前阶段：第一幕 — 酒馆经营
+
+玩家正在经营酒馆。按照每日流程推进，注意：
+- 每天开始时简要描述早晨
+- 追踪营收和NPC满意度
+- 适时触发事件
+- 玩家连续3天达标后进入资格场景`;
+
+    case 'act2':
+      return `## 当前阶段：第二幕 — 黑暗真相
+
+玩家开始发现圣焰的秘密。按照场景文件推进，注意：
+- 逐步揭示信息，不要一次全部暴露
+- 焕的调查是关键线索
+- 利希特能感知恶魔契约力量`;
+
+    case 'act3':
+      return `## 当前阶段：第三幕 — 抉择
+
+玩家面临最终选择。按照场景文件推进，注意：
+- 这是电车难题：救家人还是救城市
+- 没有正确答案
+- 根据选择走向7个结局之一`;
+
+    default:
+      return '';
   }
 }
 
-/**
- * 清除文件缓存
- */
-export function clearFileCache(): void {
-  fileCache.clear();
+function getPhaseInstructionsEn(phase: GamePhase): string {
+  switch (phase) {
+    case 'character_creation':
+      return `## Current Phase: Character Creation
+
+Your task is to guide the player through character creation. Follow these steps:
+
+1. Ask the player to choose preset template or quiz generator:
+   [1] Preset Templates (Quick Start)
+   [2] Quiz Generator (Custom Character)
+
+2. If preset, show four templates:
+   - Mediator: INT 14, Perception/Cooking
+   - Action-Oriented: DEX 14, Sleight of Hand/Stealth/Performance
+   - Persuader: CHA 16, Intimidation/Trade
+   - Warrior: STR 16, Fighting/Perception/Survival
+
+3. If quiz, ask three questions one at a time:
+   - What do you care about most? (Friendship/Money/Truth/Honor)
+   - What is your flaw? (Impulsive/Indecisive/Gluttonous/Shy)
+   - What kind of person do you want to become? (Respected/Loved/Remembered/At peace)
+   Generate stats based on answers.
+
+4. After character creation, show the character sheet, then **automatically begin the Act I opening narrative**.
+   Do not wait for player confirmation — directly start the opening scene.
+
+IMPORTANT: Start now! Output the character creation guide immediately, do not wait for the player to say anything.`;
+
+    case 'opening':
+      return `## Current Phase: Act I Opening
+
+Character creation is complete. Now begin the Act I opening narrative directly.
+Read the scene file below and narrate according to its content.
+After the opening narrative, present 2-3 options for the player to act.`;
+
+    case 'act1':
+      return `## Current Phase: Act I — Tavern Management
+
+The player is running the tavern. Follow the daily flow:
+- Briefly describe each morning
+- Track revenue and NPC satisfaction
+- Trigger events when appropriate
+- After 3 consecutive days of meeting revenue target, proceed to qualification scene`;
+
+    case 'act2':
+      return `## Current Phase: Act II — The Dark Truth
+
+The player begins discovering the Sacred Flame's secret. Follow the scene file:
+- Reveal information gradually, not all at once
+- Huan's investigation is the key clue
+- Licht can sense demonic contract power`;
+
+    case 'act3':
+      return `## Current Phase: Act III — The Choice
+
+The player faces the final choice. Follow the scene file:
+- This is the trolley problem: save family or save the city
+- There is no correct answer
+- Lead to one of 7 endings based on the choice`;
+
+    default:
+      return '';
+  }
 }

@@ -40,6 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Agent artifacts
+AGENTS.md
+CLAUDE.md
+
 # Synced from skill (auto-generated)
 src/data/prompts/
 src/data/rules/

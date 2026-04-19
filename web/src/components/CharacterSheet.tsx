@@ -76,24 +76,31 @@ export default function CharacterSheet({ character, language }: CharacterSheetPr
           </div>
         </div>
 
-        {/* Secondary stats */}
+        {/* Attribute scores */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-slate-900/50 rounded-lg p-3 text-center">
             <div className="text-amber-500/70 text-xs mb-1 uppercase tracking-wider">
-              {t.luck}
+              {language === 'zh' ? '体魄' : 'STR'}
             </div>
-            <div className="text-amber-100 text-xl font-bold">{stats.luck}</div>
+            <div className="text-amber-100 text-xl font-bold">{stats.str}</div>
           </div>
           <div className="bg-slate-900/50 rounded-lg p-3 text-center">
             <div className="text-amber-500/70 text-xs mb-1 uppercase tracking-wider">
-              {t.reputation}
+              {language === 'zh' ? '敏捷' : 'DEX'}
             </div>
-            <div className={`
-              text-xl font-bold
-              ${stats.reputation >= 0 ? 'text-green-400' : 'text-red-400'}
-            `}>
-              {stats.reputation >= 0 ? '+' : ''}{stats.reputation}
+            <div className="text-amber-100 text-xl font-bold">{stats.dex}</div>
+          </div>
+          <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+            <div className="text-amber-500/70 text-xs mb-1 uppercase tracking-wider">
+              {language === 'zh' ? '心智' : 'INT'}
             </div>
+            <div className="text-amber-100 text-xl font-bold">{stats.int}</div>
+          </div>
+          <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+            <div className="text-amber-500/70 text-xs mb-1 uppercase tracking-wider">
+              {language === 'zh' ? '魅力' : 'CHA'}
+            </div>
+            <div className="text-amber-100 text-xl font-bold">{stats.cha}</div>
           </div>
         </div>
       </div>

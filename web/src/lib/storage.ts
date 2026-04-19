@@ -1,89 +1,48 @@
 import { GameState } from './gameState';
 
-const SAVE_KEY = 'ignis-tavern-save';
-const SETTINGS_KEY = 'ignis-tavern-settings';
+const SAVE_KEY = 'ignis_tavern_save';
 
-export interface GameSettings {
-  language: 'zh' | 'en';
-  apiKey?: string;
-  useLocalApi: boolean;
+interface SaveData extends Partial<GameState> {
+  savedAt: number;
 }
 
-export const saveGame = (gameState: GameState): boolean => {
+export function saveGame(state: GameState): void {
   try {
-    const saveData = {
-      ...gameState,
-      savedAt: new Date().toISOString(),
+    const saveData: SaveData = {
+      language: state.language,
+      currentAct: state.currentAct,
+      currentScene: state.currentScene,
+      messages: state.messages,
+      character: state.character,
+      lastDiceRoll: state.lastDiceRoll,
+      userApiKey: state.userApiKey,
+      savedAt: Date.now(),
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
-    return true;
   } catch (error) {
     console.error('Failed to save game:', error);
-    return false;
   }
-};
+}
 
-export const loadGame = (): (GameState & { savedAt?: string }) | null => {
+export function loadGame(): SaveData | null {
   try {
     const data = localStorage.getItem(SAVE_KEY);
     if (!data) return null;
-    return JSON.parse(data);
+    return JSON.parse(data) as SaveData;
   } catch (error) {
     console.error('Failed to load game:', error);
     return null;
   }
-};
+}
 
-export const hasSave = (): boolean => {
+export function deleteSave(): void {
+  try {
+    localStorage.removeItem(SAVE_KEY);
+  } catch (error) {
+    console.error('Failed to delete save:', error);
+  }
+}
+
+export function hasSave(): boolean {
   return localStorage.getItem(SAVE_KEY) !== null;
-};
-
-export const deleteSave = (): void => {
-  localStorage.removeItem(SAVE_KEY);
-};
-
-export const saveSettings = (settings: GameSettings): boolean => {
-  try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-    return true;
-  } catch (error) {
-    console.error('Failed to save settings:', error);
-    return false;
-  }
-};
-
-export const loadSettings = (): GameSettings => {
-  try {
-    const data = localStorage.getItem(SETTINGS_KEY);
-    if (!data) {
-      return {
-        language: 'zh',
-        useLocalApi: false,
-      };
-    }
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Failed to load settings:', error);
-    return {
-      language: 'zh',
-      useLocalApi: false,
-    };
-  }
-};
-
-export const exportSave = (): string => {
-  const save = loadGame();
-  if (!save) return '';
-  return btoa(JSON.stringify(save));
-};
-
-export const importSave = (base64Data: string): boolean => {
-  try {
-    const data = JSON.parse(atob(base64Data));
-    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-    return true;
-  } catch (error) {
-    console.error('Failed to import save:', error);
-    return false;
-  }
-};
+}

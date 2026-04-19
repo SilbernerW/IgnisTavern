@@ -1,124 +1,283 @@
 'use client';
 
-import { useState, useReducer, useEffect, useCallback, Suspense } from 'react';
+import { useState, useReducer, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import GameChat from '@/components/GameChat';
 import CharacterSheet from '@/components/CharacterSheet';
 import DiceRoller from '@/components/DiceRoller';
-import ChoiceMenu from '@/components/ChoiceMenu';
+import ChatInput from '@/components/ChatInput';
+import StreamingText from '@/components/StreamingText';
 import LanguageSelector from '@/components/LanguageSelector';
+import ApiKeyModal from '@/components/ApiKeyModal';
 import {
   GameState,
   createInitialGameState,
   gameStateReducer,
 } from '@/lib/gameState';
-import { sendChatMessage } from '@/lib/api';
+import { streamChatMessage } from '@/lib/api';
 import { loadGame, saveGame, deleteSave } from '@/lib/storage';
+import { loadSettings, saveSettings as persistSettings } from '@/lib/settings';
+import { PROVIDERS, ProviderId } from '@/lib/providers';
 
 function GamePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [gameState, dispatch] = useReducer(
-    gameStateReducer,
-    createInitialGameState()
-  );
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [gameState, dispatch] = useReducer(gameStateReducer, createInitialGameState());
   const [showSidePanel, setShowSidePanel] = useState(false);
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [awaitingDice, setAwaitingDice] = useState(false);
   const [diceDifficulty, setDiceDifficulty] = useState<number | undefined>();
+  const [diceCheckLabel, setDiceCheckLabel] = useState<string>('');
+  const abortRef = useRef<AbortController | null>(null);
 
-  // Load saved game if continuing
+  const hasInitialized = useRef(false);
+
+  // On first load: restore save or auto-start character creation
   useEffect(() => {
-    const shouldContinue = searchParams.get('continue') === 'true';
-    if (shouldContinue) {
-      const saved = loadGame();
-      if (saved) {
-        dispatch({ type: 'SET_LANGUAGE', payload: saved.language });
-      }
-    }
-  }, [searchParams]);
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
 
-  // Save game periodically
+    // Always load settings from localStorage first
+    const settings = loadSettings();
+    if (settings.language) dispatch({ type: 'SET_LANGUAGE', payload: settings.language });
+    if (settings.apiKey) dispatch({ type: 'SET_API_KEY', payload: settings.apiKey });
+    if (settings.provider) dispatch({ type: 'SET_PROVIDER', payload: settings.provider });
+    if (settings.model) dispatch({ type: 'SET_MODEL', payload: settings.model });
+    if (settings.customApiUrl) dispatch({ type: 'SET_CUSTOM_API_URL', payload: settings.customApiUrl });
+
+    const shouldContinue = searchParams.get('continue') === 'true';
+    const saved = loadGame();
+
+    if (shouldContinue && saved && saved.messages && saved.messages.length > 0) {
+      // Restore from save
+      if (saved.language) dispatch({ type: 'SET_LANGUAGE', payload: saved.language });
+      if (saved.userApiKey) dispatch({ type: 'SET_API_KEY', payload: saved.userApiKey });
+      if (saved.provider) dispatch({ type: 'SET_PROVIDER', payload: saved.provider });
+      if (saved.model) dispatch({ type: 'SET_MODEL', payload: saved.model });
+      if (saved.customApiUrl) dispatch({ type: 'SET_CUSTOM_API_URL', payload: saved.customApiUrl });
+      for (const msg of saved.messages) {
+        dispatch({ type: 'ADD_ASSISTANT_MESSAGE', payload: msg.content });
+      }
+    } else {
+      // New game: start character creation
+      // Pass settings directly so we don't depend on async React state
+      startCharacterCreation(settings);
+    }
+  }, []);
+
+  // Auto-save periodically
   useEffect(() => {
     const interval = setInterval(() => {
-      saveGame(gameState);
+      if (gameState.messages.length > 0) {
+        saveGame(gameState);
+      }
     }, 30000);
     return () => clearInterval(interval);
   }, [gameState]);
+
+  const startCharacterCreation = async (settings?: { apiKey?: string; provider?: string; model?: string; customApiUrl?: string; language?: string }) => {
+    dispatch({ type: 'SET_STREAMING', payload: true });
+
+    const lang = settings?.language || gameState.language;
+    const key = settings?.apiKey || gameState.userApiKey;
+    const prov = settings?.provider || gameState.provider;
+    const mdl = settings?.model || gameState.model;
+    const url = settings?.customApiUrl || gameState.customApiUrl;
+
+    const triggerMessage = lang === 'zh'
+      ? '开始游戏'
+      : 'Start the game';
+
+    let fullResponse = '';
+    try {
+      for await (const chunk of streamChatMessage(
+        [{ role: 'user', content: triggerMessage }],
+        lang,
+        key,
+        'character_creation',
+        prov,
+        mdl,
+        url
+      )) {
+        fullResponse += chunk;
+        dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
+      }
+      dispatch({ type: 'FINISH_STREAMING', payload: fullResponse });
+    } catch (error: any) {
+      const errorMsg = gameState.language === 'zh'
+        ? `（连接失败：${error.message}）`
+        : `(Connection failed: ${error.message})`;
+      dispatch({ type: 'FINISH_STREAMING', payload: fullResponse || errorMsg });
+    }
+  };
 
   const handleLanguageChange = (lang: 'zh' | 'en') => {
     dispatch({ type: 'SET_LANGUAGE', payload: lang });
   };
 
-  const handleChoiceSelect = useCallback(
-    async (choiceId: string) => {
-      if (isProcessing) return;
-      setIsProcessing(true);
-      dispatch({ type: 'SET_TYPING', payload: true });
+  const handleSendMessage = useCallback(
+    async (text: string) => {
+      if (gameState.isStreaming) return;
+
+      dispatch({ type: 'ADD_USER_MESSAGE', payload: text });
+      dispatch({ type: 'SET_STREAMING', payload: true });
+      dispatch({ type: 'APPEND_STREAMING_TEXT', payload: '' }); // Reset streaming text
+
+      let fullResponse = '';
 
       try {
-        const response = await sendChatMessage({ gameState, choice: choiceId });
-        dispatch({ type: 'ADD_DIALOGUE', payload: response.dialogue });
-        if (response.choices) dispatch({ type: 'SET_CHOICES', payload: response.choices });
-        if (response.requiresDice) {
-          setAwaitingDice(true);
-          setDiceDifficulty(response.diceDifficulty);
+        // Get all messages for context (including the one we just added)
+        const contextMessages = [
+          ...gameState.messages,
+          { role: 'user' as const, content: text },
+        ];
+
+        for await (const chunk of streamChatMessage(
+          contextMessages,
+          gameState.language,
+          gameState.userApiKey,
+          gameState.currentScene,
+          gameState.provider,
+          gameState.model,
+          gameState.customApiUrl
+        )) {
+          fullResponse += chunk;
+          dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
         }
-        if (response.characterUpdate) dispatch({ type: 'UPDATE_CHARACTER', payload: response.characterUpdate });
-        if (response.actChange) dispatch({ type: 'SET_ACT', payload: response.actChange });
-      } catch {
-        dispatch({
-          type: 'ADD_DIALOGUE',
-          payload: {
-            id: Date.now().toString(),
-            speaker: '系统',
-            speakerEn: 'System',
-            text: '连接失败，请重试...',
-            textEn: 'Connection failed, please try again...',
-          },
-        });
-      } finally {
-        setIsProcessing(false);
+
+        dispatch({ type: 'FINISH_STREAMING', payload: fullResponse });
+
+        // Check if the response contains a dice check request
+        // Support both Chinese and English patterns
+        const dicePatterns = [
+          /🎲\s*检定[：:]\s*(\S+)\s*DC\s*(\d+)/i,
+          /🎲\s*Check[：:]\s*(\S+)\s*DC\s*(\d+)/i,
+          /检定[：:]\s*(\S+)\s*DC\s*(\d+)/i,
+          /Check[：:]\s*(\S+)\s*DC\s*(\d+)/i,
+          /DC\s*(\d+)/i,
+        ];
+
+        let detectedDC: number | undefined;
+        let detectedLabel = '';
+        for (const pattern of dicePatterns) {
+          const match = fullResponse.match(pattern);
+          if (match) {
+            detectedDC = parseInt(match[2] || match[1]);
+            // If the pattern captures a label (e.g. "体魄", "STR"), use it
+            if (match.length >= 3 && match[1] && !/^\d+$/.test(match[1])) {
+              detectedLabel = match[1];
+            }
+            break;
+          }
+        }
+
+        if (detectedDC) {
+          setAwaitingDice(true);
+          setDiceDifficulty(detectedDC);
+          setDiceCheckLabel(detectedLabel);
+        }
+      } catch (error: any) {
+        const errorMsg = gameState.language === 'zh'
+          ? `（连接失败：${error.message}）`
+          : `(Connection failed: ${error.message})`;
+        dispatch({ type: 'FINISH_STREAMING', payload: fullResponse || errorMsg });
       }
     },
-    [gameState, isProcessing]
+    [gameState.messages, gameState.isStreaming, gameState.language, gameState.userApiKey]
   );
 
   const handleDiceRoll = useCallback(
     async (result: number) => {
       const success = diceDifficulty ? result >= diceDifficulty : true;
-      dispatch({ type: 'SET_DICE_ROLL', payload: { result, success, difficulty: diceDifficulty || 0 } });
-      setIsProcessing(true);
+      dispatch({
+        type: 'SET_DICE_ROLL',
+        payload: { result, success, difficulty: diceDifficulty || 0 },
+      });
 
-      try {
-        const response = await sendChatMessage({
-          gameState: { ...gameState, lastDiceRoll: { result, success, difficulty: diceDifficulty || 0 } },
-        });
-        dispatch({ type: 'ADD_DIALOGUE', payload: response.dialogue });
-        if (response.choices) dispatch({ type: 'SET_CHOICES', payload: response.choices });
-        setAwaitingDice(false);
-        setDiceDifficulty(undefined);
-      } catch (error) {
-        console.error('Failed to send dice roll:', error);
-      } finally {
-        setIsProcessing(false);
-      }
+      // Send dice result as a follow-up message
+      const diceMsg = gameState.language === 'zh'
+        ? `[骰子结果：d20=${result}${diceDifficulty ? ` vs DC${diceDifficulty}` : ''} → ${success ? '成功' : '失败'}]`
+        : `[Dice result: d20=${result}${diceDifficulty ? ` vs DC${diceDifficulty}` : ''} → ${success ? 'Success' : 'Failure'}]`;
+
+      setAwaitingDice(false);
+      setDiceDifficulty(undefined);
+      setDiceCheckLabel('');
+
+      await handleSendMessage(diceMsg);
     },
-    [gameState, diceDifficulty]
+    [diceDifficulty, gameState.language, handleSendMessage]
   );
 
-  const handleTypingComplete = () => dispatch({ type: 'SET_TYPING', payload: false });
-  const handleBackToMenu = () => { saveGame(gameState); router.push('/'); };
-  const handleNewGame = () => { deleteSave(); window.location.reload(); };
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const texts = {
-    zh: { back: '返回', newGame: '新游戏', act: '第 $ 幕', waitDice: '请掷骰子...', processing: '处理中...' },
-    en: { back: 'Back', newGame: 'New Game', act: 'Act $', waitDice: 'Please roll...', processing: 'Processing...' },
+  // Auto-scroll to bottom when new content arrives
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [gameState.messages, gameState.displayedText, gameState.isStreaming]);
+
+  const handleApiKeySave = (settings: { apiKey: string; provider: string; model: string; customApiUrl: string }) => {
+    dispatch({ type: 'SET_API_KEY', payload: settings.apiKey });
+    dispatch({ type: 'SET_PROVIDER', payload: settings.provider });
+    dispatch({ type: 'SET_MODEL', payload: settings.model });
+    dispatch({ type: 'SET_CUSTOM_API_URL', payload: settings.customApiUrl });
+    persistSettings(settings); // Persist to localStorage
+    setShowApiKeyModal(false);
   };
-  const t = texts[gameState.language];
+
+  const handleBackToMenu = () => {
+    saveGame(gameState);
+    router.push('/');
+  };
+
+  const handleNewGame = () => {
+    deleteSave();
+    window.location.reload();
+  };
+
+  const t = {
+    zh: {
+      back: '返回',
+      newGame: '新游戏',
+      act: '第 $ 幕',
+      panel: '面板',
+      apiKey: 'API Key',
+      welcome: '🔥 欢迎来到伊格尼斯酒馆 🔥\n\n输入任意内容开始你的冒险...',
+    },
+    en: {
+      back: 'Back',
+      newGame: 'New Game',
+      act: 'Act $',
+      panel: 'Panel',
+      apiKey: 'API Key',
+      welcome: '🔥 Welcome to Ignis Tavern 🔥\n\nType anything to begin your adventure...',
+    },
+  };
+
+  const lang = gameState.language;
+  const text = t[lang];
+
+  // Build display messages: combine history + current streaming buffer
+  const displayMessages = [
+    ...gameState.messages.map((msg, i) => ({
+      role: msg.role,
+      content: msg.content,
+      isHistory: true as const,
+      index: i,
+    })),
+  ];
+
+  // The streaming buffer — all text received for the current response
+  const streamingBuffer = gameState.isStreaming
+    ? (gameState.messages.length > 0
+        ? gameState.messages[gameState.messages.length - 1].content // not used for streaming
+        : '') + gameState.displayedText
+    : '';
+  // Actually: for streaming, we track displayedText as the buffer
+  const currentStreamBuffer = gameState.displayedText;
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col">
+    <div className="h-screen bg-slate-950 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="bg-slate-900/80 border-b border-amber-700/30 px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
@@ -126,68 +285,156 @@ function GamePageContent() {
             onClick={handleBackToMenu}
             className="text-amber-400/70 hover:text-amber-400 transition-colors text-sm"
           >
-            ← {t.back}
+            ← {text.back}
           </button>
           <span className="text-amber-700/50">|</span>
-          <span className="text-amber-300">
-            {t.act.replace('$', gameState.currentAct.toString())}
+          <span className="text-amber-300 text-sm">
+            {text.act.replace('$', gameState.currentAct.toString())}
           </span>
+          {/* Current model indicator */}
+          {gameState.provider && gameState.model && (
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-800/80 border border-amber-700/20 text-xs text-amber-500/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500/70 animate-pulse" />
+              {PROVIDERS[gameState.provider as ProviderId]?.name || gameState.provider} · {gameState.model}
+            </span>
+          )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSidePanel(!showSidePanel)}
-            className="md:hidden text-amber-400/70 hover:text-amber-400 transition-colors px-2 py-1 border border-amber-700/30 rounded"
+            className="md:hidden text-amber-400/70 hover:text-amber-400 px-2 py-1 border border-amber-700/30 rounded text-sm"
           >
-            {gameState.language === 'zh' ? '面板' : 'Panel'}
+            {text.panel}
           </button>
-
           <button
-            onClick={handleNewGame}
-            className="hidden sm:block text-amber-400/70 hover:text-amber-400 transition-colors text-sm"
+            onClick={() => setShowApiKeyModal(true)}
+            className="text-amber-400/70 hover:text-amber-400 text-sm"
           >
-            {t.newGame}
+            {text.apiKey}
           </button>
-
-          <LanguageSelector
-            currentLang={gameState.language}
-            onChange={handleLanguageChange}
-            size="sm"
-          />
+          <LanguageSelector currentLang={lang} onChange={handleLanguageChange} size="sm" />
         </div>
       </header>
 
       {/* Main game area */}
       <main className="flex-1 flex overflow-hidden">
-        {/* Left: Dialogue area */}
+        {/* Left: Chat area */}
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex-1 overflow-hidden px-4 py-4">
-            <div className="h-full bg-slate-900/30 rounded-xl border border-amber-700/20 p-4">
-              <GameChat
-                dialogue={gameState.dialogue}
-                language={gameState.language}
-                isTyping={gameState.isTyping}
-                onTypingComplete={handleTypingComplete}
-              />
+          {/* Messages */}
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 scroll-smooth">
+            <div className="max-w-3xl mx-auto">
+              {/* Initial loading — game is starting */}
+              {displayMessages.length === 0 && !gameState.isStreaming && (
+                <div className="text-amber-300/60 text-center mt-20 whitespace-pre-line text-lg">
+                  {text.welcome}
+                </div>
+              )}
+
+              {/* Initial loading animation */}
+              {displayMessages.length === 0 && gameState.isStreaming && !gameState.displayedText && (
+                <div className="flex flex-col items-center justify-center mt-20 gap-6">
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-600/30 to-orange-600/30 flex items-center justify-center animate-pulse">
+                      <span className="text-4xl">🔥</span>
+                    </div>
+                    <div className="absolute inset-0 rounded-full border-2 border-amber-500/40 animate-ping" />
+                  </div>
+                  <div className="text-amber-300/70 text-base">
+                    {lang === 'zh' ? '炉火正在点燃...' : 'The hearth fire is being lit...'}
+                  </div>
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-500/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-amber-500/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-amber-500/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              )}
+
+              {displayMessages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`mb-4 ${
+                    msg.role === 'user' ? 'flex justify-end' : ''
+                  }`}
+                >
+                  <div
+                    className={`${
+                      msg.role === 'user'
+                        ? 'bg-amber-900/30 border border-amber-700/30 rounded-xl px-4 py-3 max-w-[80%]'
+                        : 'text-amber-100/90 leading-relaxed'
+                    }`}
+                  >
+                    <div className="whitespace-pre-wrap text-sm md:text-base">
+                      {msg.content}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Current streaming response with smooth typewriter */}
+              {gameState.isStreaming && currentStreamBuffer && (
+                <div className="mb-4 text-amber-100/90 leading-relaxed">
+                  <StreamingText
+                    buffer={currentStreamBuffer}
+                    isStreaming={gameState.isStreaming}
+                    baseSpeed={20}
+                    className="whitespace-pre-wrap text-sm md:text-base"
+                  />
+                </div>
+              )}
+              {gameState.isStreaming && !currentStreamBuffer && displayMessages.length > 0 && (
+                <div className="mb-4 flex items-center gap-3 text-amber-400/60">
+                  <div className="flex gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                  <span className="text-sm italic">
+                    {lang === 'zh' ? 'DM 正在思考...' : 'DM is thinking...'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Choices area */}
-          <div className="shrink-0 px-4 pb-4">
-            {awaitingDice ? (
-              <div className="text-center py-4 text-amber-300">
-                ✦ {t.waitDice} ✦
-              </div>
-            ) : (
-              <div className="max-w-2xl">
-                <ChoiceMenu
-                  choices={gameState.choices || []}
-                  onSelect={handleChoiceSelect}
-                  language={gameState.language}
-                  disabled={isProcessing || gameState.isTyping}
-                />
-              </div>
-            )}
+          {/* Input area */}
+          <div className="shrink-0 border-t border-amber-700/20 bg-slate-900/50 px-4 py-3">
+            <div className="max-w-3xl mx-auto">
+              {/* Dice check notification */}
+              {awaitingDice && (
+                <div className="flex items-center justify-center gap-3 py-2 mb-2 rounded-lg bg-amber-900/20 border border-amber-700/30">
+                  <span className="text-amber-300 text-sm">
+                    🎲 {lang === 'zh' ? '需要投骰！' : 'Dice check needed!'} DC {diceDifficulty}
+                  </span>
+                  <button
+                    onClick={() => {
+                      const diceSection = document.getElementById('dice-roller');
+                      diceSection?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-amber-400 text-sm underline"
+                  >
+                    {lang === 'zh' ? '去投骰 →' : 'Roll →'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAwaitingDice(false);
+                      setDiceDifficulty(undefined);
+                      setDiceCheckLabel('');
+                    }}
+                    className="text-amber-500/50 text-xs ml-2"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              <ChatInput
+                onSubmit={handleSendMessage}
+                disabled={gameState.isStreaming}
+                language={lang}
+              />
+            </div>
           </div>
         </div>
 
@@ -210,10 +457,16 @@ function GamePageContent() {
           </button>
 
           <div className="h-full p-4 flex flex-col gap-4 overflow-y-auto">
-            <CharacterSheet character={gameState.character} language={gameState.language} />
-            <DiceRoller onRoll={handleDiceRoll} disabled={!awaitingDice || isProcessing} difficulty={diceDifficulty} />
-            <div className="text-center pb-4 md:hidden">
-              <span className="text-amber-700/50">Ignis Tavern</span>
+            <CharacterSheet character={gameState.character} language={lang} />
+            {/* Dice roller — locked until DM requests a check */}
+            <div id="dice-roller">
+              <DiceRoller
+                onRoll={handleDiceRoll}
+                disabled={gameState.isStreaming}
+                locked={!awaitingDice}
+                difficulty={diceDifficulty}
+                checkLabel={diceCheckLabel}
+              />
             </div>
           </div>
         </aside>
@@ -221,19 +474,36 @@ function GamePageContent() {
 
       {/* Mobile overlay */}
       {showSidePanel && (
-        <div className="md:hidden fixed inset-0 bg-black/50 z-30" onClick={() => setShowSidePanel(false)} />
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-30"
+          onClick={() => setShowSidePanel(false)}
+        />
       )}
+
+      {/* API Key Modal */}
+      <ApiKeyModal
+        isOpen={showApiKeyModal}
+        onClose={() => setShowApiKeyModal(false)}
+        onSave={handleApiKeySave}
+        currentKey={gameState.userApiKey}
+        currentProvider={gameState.provider}
+        currentModel={gameState.model}
+        currentCustomApiUrl={gameState.customApiUrl}
+        language={lang}
+      />
     </div>
   );
 }
 
 export default function GamePage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-amber-400 text-xl animate-pulse">Loading...</div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+          <div className="text-amber-400 text-xl animate-pulse">Loading...</div>
+        </div>
+      }
+    >
       <GamePageContent />
     </Suspense>
   );
