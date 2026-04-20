@@ -8,11 +8,13 @@ import ChatInput from '@/components/ChatInput';
 import StreamingText from '@/components/StreamingText';
 import LanguageSelector from '@/components/LanguageSelector';
 import ApiKeyModal from '@/components/ApiKeyModal';
+import CharacterCreation from '@/components/CharacterCreation';
 import {
   GameState,
   createInitialGameState,
   gameStateReducer,
 } from '@/lib/gameState';
+import { parseDiceCheck, calculateRollResult, formatRollMessage } from '@/lib/diceMachine';
 import { streamChatMessage } from '@/lib/api';
 import { loadGame, saveGame, deleteSave } from '@/lib/storage';
 import { loadSettings, saveSettings as persistSettings } from '@/lib/settings';
@@ -24,35 +26,21 @@ function GamePageContent() {
   const [gameState, dispatch] = useReducer(gameStateReducer, createInitialGameState());
   const [showSidePanel, setShowSidePanel] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  const [awaitingDice, setAwaitingDice] = useState(false);
-  const [diceDifficulty, setDiceDifficulty] = useState<number | undefined>();
-  const [diceCheckLabel, setDiceCheckLabel] = useState<string>('');
+  const [showCharacterCreation, setShowCharacterCreation] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
 
   const hasInitialized = useRef(false);
 
   /**
-   * Parse [CHAR:...] state tags from DM response text.
-   * Also strips all [CHAR:...] and [PHASE_TRANSITION:...] tags from the text.
-   * Returns the cleaned text (tags removed) for display.
-   *
-   * Supported tags:
-   *   [CHAR:name=X]          → set character name
-   *   [CHAR:stats=STRxx,DEXxx,INTxx,CHAxx]  → set all stats (character creation)
-   *   [CHAR:stats=体魄xx,敏捷xx,心智xx,魅力xx]  → same, Chinese
-   *   [CHAR:hp=X/Y]          → set current/max HP
-   *   [CHAR:item+=X]         → add item to inventory
-   *   [CHAR:item-=X]         → remove item from inventory
-   *   [CHAR:skill+=X]        → add skill
+   * Strip all [CHAR:...] and [PHASE_TRANSITION:...] tags from DM text.
+   * Parse [CHAR:...] tags for in-game state changes (HP, items, skills).
+   * Returns cleaned text for display.
    */
-  function parseAndStripTags(
+  function stripAndParseTags(
     text: string,
     dispatchFn: React.Dispatch<any>,
-    lang: 'zh' | 'en'
   ): string {
-    let cleaned = text;
-
-    // ── Parse [CHAR:...] tags ──
+    // Parse [CHAR:...] tags for in-game updates
     const tagRegex = /\[CHAR:(\w+)=([^\]]+)\]/g;
     let match: RegExpExecArray | null;
 
@@ -61,50 +49,7 @@ function GamePageContent() {
       const value = match[2];
 
       switch (key) {
-        case 'name': {
-          dispatchFn({
-            type: 'SET_CHARACTER_NAME',
-            payload: { name: value, nameEn: lang === 'en' ? value : '' },
-          });
-          break;
-        }
-        case 'stats': {
-          // Parse both Chinese and English stat formats
-          // EN: STR10,DEX14,INT10,CHA12
-          // ZH: 体魄10,敏捷14,心智10,魅力12
-          const statMap: Record<string, string> = {
-            'str': 'str', 'STR': 'str',
-            'dex': 'dex', 'DEX': 'dex',
-            'int': 'int', 'INT': 'int',
-            'cha': 'cha', 'CHA': 'cha',
-            '体魄': 'str', '敏捷': 'dex', '心智': 'int', '魅力': 'cha',
-          };
-          const parsedStats: Record<string, number> = {};
-          const parts = value.split(',');
-          for (const part of parts) {
-            // Try to extract stat name + number
-            // Match: STR10, str10, 体魄10, etc.
-            const statMatch = part.match(/^([a-zA-Z]+|体魄|敏捷|心智|魅力)(\d+)$/);
-            if (statMatch) {
-              const statKey = statMap[statMatch[1]];
-              const statVal = parseInt(statMatch[2]);
-              if (statKey && statVal >= 1 && statVal <= 20) {
-                parsedStats[statKey] = statVal;
-              }
-            }
-          }
-          if (Object.keys(parsedStats).length > 0) {
-            // Calculate HP
-            const strVal = parsedStats.str || 10;
-            const strMod = strVal >= 16 ? 3 : strVal >= 14 ? 2 : strVal >= 12 ? 1 : strVal >= 10 ? 0 : -1;
-            parsedStats.hp = 5 + strMod;
-            parsedStats.maxHp = 5 + strMod;
-            dispatchFn({ type: 'UPDATE_CHARACTER_STATS', payload: parsedStats });
-          }
-          break;
-        }
         case 'hp': {
-          // value = "4/5" or "0/5"
           const hpMatch = value.match(/^(\d+)\/(\d+)$/);
           if (hpMatch) {
             const hp = parseInt(hpMatch[1]);
@@ -127,17 +72,101 @@ function GamePageContent() {
           dispatchFn({ type: 'ADD_CHARACTER_SKILL', payload: value });
           break;
         }
+        case 'xp': {
+          const xp = parseInt(value);
+          if (xp > 0) dispatchFn({ type: 'ADD_XP', payload: xp });
+          break;
+        }
+        case 'npc+': {
+          // npc name, satisfaction change: e.g. [CHAR:npc+=yu:5] means +5 satisfaction
+          const npcMatch = value.match(/^(\w+):(-?\d+)$/);
+          if (npcMatch) {
+            const npcName = npcMatch[1];
+            const delta = parseInt(npcMatch[2]);
+            const current = gameState.npcRelations.find(n => n.name === npcName);
+            if (current) {
+              dispatchFn({ type: 'SET_NPC_SATISFACTION', payload: { npcName, satisfaction: current.satisfaction + delta } });
+            }
+          }
+          break;
+        }
       }
     }
 
-    // ── Strip all tags from display text ──
+    // Strip all tags
+    let cleaned = text;
     cleaned = cleaned.replace(/\[CHAR:\w+=[^\]]+\]/g, '');
     cleaned = cleaned.replace(/\[PHASE_TRANSITION:\w+\]/g, '');
-    // Clean up blank lines left by removed tags
     cleaned = cleaned.replace(/\n{3,}/g, '\n\n').trim();
 
     return cleaned;
   }
+
+  // Handle character creation completion (from CharacterCreation UI)
+  const handleCharacterCreated = useCallback(
+    (character: {
+      name: string;
+      nameEn: string;
+      stats: { str: number; dex: number; int: number; cha: number };
+      skills: string[];
+      templateId: string;
+    }) => {
+      // Calculate HP from STR
+      const strMod = Math.floor((character.stats.str - 10) / 2);
+      const hp = 5 + strMod;
+
+      dispatch({ type: 'SET_CHARACTER_NAME', payload: { name: character.name, nameEn: character.nameEn } });
+      dispatch({ type: 'UPDATE_CHARACTER_STATS', payload: { ...character.stats, hp, maxHp: hp } });
+      dispatch({ type: 'UPDATE_CHARACTER_SKILLS', payload: character.skills });
+
+      // Hide character creation, start the game
+      setShowCharacterCreation(false);
+      dispatch({ type: 'SET_SCENE', payload: 'opening' });
+      dispatch({ type: 'SET_ACT', payload: 1 });
+
+      // Trigger opening scene narration
+      startOpeningNarration();
+    },
+    []
+  );
+
+  const startOpeningNarration = useCallback(
+    async () => {
+      dispatch({ type: 'SET_STREAMING', payload: true });
+
+      const lang = gameState.language;
+      const key = gameState.userApiKey;
+      const prov = gameState.provider;
+      const mdl = gameState.model;
+      const url = gameState.customApiUrl;
+
+      const triggerMessage = lang === 'zh'
+        ? '角色已创建完成。请按照场景文件原文，开始第一幕开场叙事。'
+        : 'Character creation is complete. Begin the Act I opening scene, using the scene file text verbatim.';
+
+      let fullResponse = '';
+      try {
+        for await (const chunk of streamChatMessage(
+          [{ role: 'user', content: triggerMessage }],
+          lang,
+          key,
+          'opening',
+          prov,
+          mdl,
+          url
+        )) {
+          fullResponse += chunk;
+          dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
+        }
+        const cleaned = stripAndParseTags(fullResponse, dispatch);
+        dispatch({ type: 'FINISH_STREAMING', payload: cleaned });
+      } catch (error: any) {
+        const errMsg = lang === 'zh' ? `连接失败：${error.message || '未知错误'}` : `Connection failed: ${error.message || 'Unknown error'}`;
+        dispatch({ type: 'FINISH_STREAMING', payload: errMsg });
+      }
+    },
+    [gameState.language, gameState.userApiKey, gameState.provider, gameState.model, gameState.customApiUrl]
+  );
 
   // On first load: restore save or auto-start character creation
   useEffect(() => {
@@ -167,9 +196,8 @@ function GamePageContent() {
         dispatch({ type: 'ADD_ASSISTANT_MESSAGE', payload: msg.content });
       }
     } else {
-      // New game: start character creation
-      // Pass settings directly so we don't depend on async React state
-      startCharacterCreation(settings);
+      // New game: show character creation UI
+      startCharacterCreation();
     }
   }, []);
 
@@ -183,73 +211,10 @@ function GamePageContent() {
     return () => clearInterval(interval);
   }, [gameState]);
 
-  const startCharacterCreation = async (settings?: { apiKey?: string; provider?: string; model?: string; customApiUrl?: string; language?: string }) => {
-    dispatch({ type: 'SET_STREAMING', payload: true });
-
-    const lang = settings?.language || gameState.language;
-    const key = settings?.apiKey || gameState.userApiKey;
-    const prov = settings?.provider || gameState.provider;
-    const mdl = settings?.model || gameState.model;
-    const url = settings?.customApiUrl || gameState.customApiUrl;
-
-    const triggerMessage = lang === 'zh'
-      ? '开始游戏'
-      : 'Start the game';
-
-    let fullResponse = '';
-    try {
-      for await (const chunk of streamChatMessage(
-        [{ role: 'user', content: triggerMessage }],
-        lang,
-        key,
-        'character_creation',
-        prov,
-        mdl,
-        url
-      )) {
-        fullResponse += chunk;
-        dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
-      }
-      // Parse tags and get cleaned text (tags stripped for display)
-      const cleanedText = parseAndStripTags(fullResponse, dispatch, lang as 'zh' | 'en');
-      dispatch({ type: 'FINISH_STREAMING', payload: cleanedText });
-
-      // Check for phase transition in character creation response
-      const charPhaseMatch = fullResponse.match(/\[PHASE_TRANSITION:(\w+)\]/);
-      if (charPhaseMatch) {
-        if (charPhaseMatch[1] === 'opening') {
-          setTimeout(() => {
-            dispatch({ type: 'SET_SCENE', payload: 'opening' });
-            dispatch({ type: 'SET_ACT', payload: 1 });
-          }, 1500);
-        }
-      }
-    } catch (error: any) {
-      let errMsg = error.message || 'Unknown error';
-      if (errMsg.includes('daily_limit')) {
-        errMsg = lang === 'zh'
-          ? '今日免费额度已用完（10次/天）。请点击右上角 🔑「API Key」配置自己的 Key 解除限制！'
-          : 'Daily free limit reached (10/day). Click 🔑 "API Key" in the top-right to configure your own key!';
-        setTimeout(() => setShowApiKeyModal(true), 500);
-      } else if (errMsg.includes('abort') || errMsg.includes('AbortError')) {
-        errMsg = lang === 'zh'
-          ? '请求超时（30秒无响应）。保底模型可能已不可用，请点击右上角「API Key」配置自己的 Key。'
-          : 'Request timed out (30s). Fallback model may be unavailable — please click "API Key" to configure your own.';
-      } else if (errMsg.includes('balance') || errMsg.includes('depleted') || errMsg.includes('insufficient')) {
-        errMsg = lang === 'zh'
-          ? '保底模型余额不足。请点击右上角「API Key」配置自己的 Key。'
-          : 'Fallback model balance depleted. Please click "API Key" to configure your own.';
-      } else if (errMsg.includes('401') || errMsg.includes('403')) {
-        errMsg = lang === 'zh'
-          ? 'API Key 无效或余额不足。请点击右上角「API Key」检查设置。'
-          : 'API key invalid or balance depleted. Please click "API Key" to check settings.';
-      } else {
-        errMsg = lang === 'zh'
-          ? `连接失败：${errMsg}`
-          : `Connection failed: ${errMsg}`;
-      }
-      dispatch({ type: 'FINISH_STREAMING', payload: fullResponse || errMsg });
-    }
+  const startCharacterCreation = () => {
+    // Just show the CharacterCreation UI component
+    // No LLM call needed — character data is front-end driven
+    setShowCharacterCreation(true);
   };
 
   const handleLanguageChange = (lang: 'zh' | 'en') => {
@@ -286,38 +251,24 @@ function GamePageContent() {
           dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
         }
 
-        // Parse tags and get cleaned text (all tags stripped for display)
-        const cleanedText = parseAndStripTags(fullResponse, dispatch, lang);
+        // Strip and parse tags (HP, items, skills, etc.)
+        const cleanedText = stripAndParseTags(fullResponse, dispatch);
 
         dispatch({ type: 'FINISH_STREAMING', payload: cleanedText });
 
-        // Check if the response contains a dice check request
-        // (check against fullResponse since tags are stripped from cleanedText)
-        const dicePatterns = [
-          /🎲\s*检定[：:]\s*(\S+)\s*DC\s*(\d+)/i,
-          /🎲\s*Check[：:]\s*(\S+)\s*DC\s*(\d+)/i,
-          /检定[：:]\s*(\S+)\s*DC\s*(\d+)/i,
-          /Check[：:]\s*(\S+)\s*DC\s*(\d+)/i,
-          /DC\s*(\d+)/i,
-        ];
-
-        let detectedDC: number | undefined;
-        let detectedLabel = '';
-        for (const pattern of dicePatterns) {
-          const match = fullResponse.match(pattern);
-          if (match) {
-            detectedDC = parseInt(match[2] || match[1]);
-            if (match.length >= 3 && match[1] && !/^\d+$/.test(match[1])) {
-              detectedLabel = match[1];
-            }
-            break;
+        // Dice check: only detect when diceState is 'idle'
+        if (gameState.diceState === 'idle') {
+          const check = parseDiceCheck(fullResponse);
+          if (check) {
+            dispatch({ type: 'SET_DICE_STATE', payload: 'awaiting_roll' });
+            dispatch({ type: 'SET_CURRENT_CHECK', payload: check });
           }
         }
 
-        if (detectedDC) {
-          setAwaitingDice(true);
-          setDiceDifficulty(detectedDC);
-          setDiceCheckLabel(detectedLabel);
+        // Reset dice state to idle after roll was resolved and DM responded
+        if (gameState.diceState === 'roll_resolved') {
+          dispatch({ type: 'SET_DICE_STATE', payload: 'idle' });
+          dispatch({ type: 'SET_CURRENT_CHECK', payload: null });
         }
 
         // Handle phase transition (check against original fullResponse)
@@ -374,24 +325,25 @@ function GamePageContent() {
 
   const handleDiceRoll = useCallback(
     async (result: number) => {
-      const success = diceDifficulty ? result >= diceDifficulty : true;
+      const check = gameState.currentCheck;
+      if (!check) return;
+
+      const statValue = gameState.character.stats[check.attribute as keyof typeof gameState.character.stats] || 10;
+      const rollResult = calculateRollResult(result, statValue, check.dc);
+
       dispatch({
         type: 'SET_DICE_ROLL',
-        payload: { result, success, difficulty: diceDifficulty || 0 },
+        payload: { result: rollResult.total, success: rollResult.success, difficulty: check.dc },
       });
 
+      // Transition to roll_resolved
+      dispatch({ type: 'SET_DICE_STATE', payload: 'roll_resolved' });
+
       // Send dice result as a follow-up message
-      const diceMsg = gameState.language === 'zh'
-        ? `[骰子结果：d20=${result}${diceDifficulty ? ` vs DC${diceDifficulty}` : ''} → ${success ? '成功' : '失败'}]`
-        : `[Dice result: d20=${result}${diceDifficulty ? ` vs DC${diceDifficulty}` : ''} → ${success ? 'Success' : 'Failure'}]`;
-
-      setAwaitingDice(false);
-      setDiceDifficulty(undefined);
-      setDiceCheckLabel('');
-
+      const diceMsg = formatRollMessage(rollResult, gameState.language);
       await handleSendMessage(diceMsg);
     },
-    [diceDifficulty, gameState.language, handleSendMessage]
+    [gameState.currentCheck, gameState.character.stats, gameState.language, handleSendMessage]
   );
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -466,6 +418,14 @@ function GamePageContent() {
 
   return (
     <div className="h-screen bg-slate-950 flex flex-col overflow-hidden">
+      {/* Character Creation Overlay */}
+      {showCharacterCreation && (
+        <CharacterCreation
+          language={lang}
+          onComplete={handleCharacterCreated}
+        />
+      )}
+
       {/* Header */}
       <header className="bg-slate-900/80 border-b border-amber-700/30 px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
@@ -598,10 +558,10 @@ function GamePageContent() {
           <div className="shrink-0 border-t border-amber-700/20 bg-slate-900/50 px-4 py-3">
             <div className="max-w-3xl mx-auto">
               {/* Dice check notification */}
-              {awaitingDice && (
-                <div className="flex items-center justify-center gap-3 py-2 mb-2 rounded-lg bg-amber-900/20 border border-amber-700/30">
+              {gameState.diceState === 'awaiting_roll' && gameState.currentCheck && (
+                <div className="flex items-center justify-center gap-3 py-2 mb-2 rounded-lg bg-amber-900/20 border border-amber-700/30 animate-pulse">
                   <span className="text-amber-300 text-sm">
-                    🎲 {lang === 'zh' ? '需要投骰！' : 'Dice check needed!'} DC {diceDifficulty}
+                    🎲 {lang === 'zh' ? '需要投骰！' : 'Dice check needed!'} {gameState.currentCheck.label} DC {gameState.currentCheck.dc}
                   </span>
                   <button
                     onClick={() => {
@@ -611,16 +571,6 @@ function GamePageContent() {
                     className="text-amber-400 text-sm underline"
                   >
                     {lang === 'zh' ? '去投骰 →' : 'Roll →'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setAwaitingDice(false);
-                      setDiceDifficulty(undefined);
-                      setDiceCheckLabel('');
-                    }}
-                    className="text-amber-500/50 text-xs ml-2"
-                  >
-                    ✕
                   </button>
                 </div>
               )}
@@ -654,14 +604,19 @@ function GamePageContent() {
 
           <div className="h-full p-4 flex flex-col gap-4 overflow-y-auto">
             <CharacterSheet character={gameState.character} language={lang} phase={gameState.currentScene} />
-            {/* Dice roller — locked until DM requests a check */}
+            {/* Dice roller — state machine driven */}
             <div id="dice-roller">
               <DiceRoller
                 onRoll={handleDiceRoll}
                 disabled={gameState.isStreaming}
-                locked={!awaitingDice}
-                difficulty={diceDifficulty}
-                checkLabel={diceCheckLabel}
+                locked={gameState.diceState === 'idle'}
+                difficulty={gameState.currentCheck?.dc}
+                checkLabel={gameState.currentCheck?.label || ''}
+                diceState={gameState.diceState}
+                statValue={gameState.currentCheck
+                  ? gameState.character.stats[gameState.currentCheck.attribute as keyof typeof gameState.character.stats] || 10
+                  : 10}
+                language={lang}
               />
             </div>
           </div>
