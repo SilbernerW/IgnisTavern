@@ -139,7 +139,7 @@ Your tavern is failing. Three eccentric employees are already here — on probat
 2. **创建角色** — DM 引导选择模板或问答
 3. **第一幕** — 经营酒馆，赢得三位员工的信任
 4. **资格确认** — 达成连续3天达标
-5. **第二/三幕** — 开发中（当前 Skill 原型默认到第一幕结束）
+5. **第二/三幕** — 第二幕已接入主流程，第三幕开发中
 
 ---
 
@@ -214,7 +214,7 @@ Status labels used in this section:
 | Scope | Status | Notes |
 |------|--------|-------|
 | **Act I** | **Verified** | Opening + tavern management + qualification are playable in current flow (中文/English) |
-| **Act II** | **In Progress** | Investigation/revelation content exists, but not yet part of the default Skill playable endpoint |
+| **Act II** | **In Progress** | Investigation/revelation is part of the current Skill flow; content and branching are still being polished |
 | **Act III** | **Planned** | Ending design exists; full production integration is not in the default playable flow |
 | **NPC Dialogue (Act II)** | **In Progress** | Dialogue files exist but are not fully finalized across all NPC branches |
 
