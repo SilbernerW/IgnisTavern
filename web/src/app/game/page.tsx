@@ -29,6 +29,23 @@ function GamePageContent() {
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
+  // Ref to always have latest API settings (avoids stale closure issues)
+  const apiSettingsRef = useRef({
+    language: gameState.language,
+    userApiKey: gameState.userApiKey,
+    provider: gameState.provider,
+    model: gameState.model,
+    customApiUrl: gameState.customApiUrl,
+  });
+  // Keep ref in sync with state
+  apiSettingsRef.current = {
+    language: gameState.language,
+    userApiKey: gameState.userApiKey,
+    provider: gameState.provider,
+    model: gameState.model,
+    customApiUrl: gameState.customApiUrl,
+  };
+
   const hasInitialized = useRef(false);
 
   /**
@@ -154,7 +171,7 @@ function GamePageContent() {
 
       // Send the opening trigger as a user message
       // route.ts will detect phase=opening and inject the scene trigger
-      const triggerMessage = gameState.language === 'zh'
+      const triggerMessage = apiSettingsRef.current.language === 'zh'
         ? '角色已创建完成，请开始游戏'
         : 'Character creation complete, start the game';
 
@@ -162,18 +179,18 @@ function GamePageContent() {
       dispatch({ type: 'SET_STREAMING', payload: true });
       dispatch({ type: 'APPEND_STREAMING_TEXT', payload: '' });
 
-      // Use a ref-safe approach: directly call the API
       (async () => {
+        const s = apiSettingsRef.current;
         let fullResponse = '';
         try {
           for await (const chunk of streamChatMessage(
             [{ role: 'user', content: triggerMessage }],
-            gameState.language,
-            gameState.userApiKey,
-            'opening', // hardcode opening scene
-            gameState.provider,
-            gameState.model,
-            gameState.customApiUrl
+            s.language,
+            s.userApiKey,
+            'opening',
+            s.provider,
+            s.model,
+            s.customApiUrl
           )) {
             fullResponse += chunk;
             dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
@@ -188,14 +205,15 @@ function GamePageContent() {
             dispatch({ type: 'SET_CURRENT_CHECK', payload: check });
           }
         } catch (error: any) {
-          const errMsg = gameState.language === 'zh'
+          const s = apiSettingsRef.current;
+          const errMsg = s.language === 'zh'
             ? `连接失败：${error.message || '未知错误'}`
             : `Connection failed: ${error.message || 'Unknown error'}`;
           dispatch({ type: 'FINISH_STREAMING', payload: errMsg });
         }
       })();
     },
-    [gameState.language, gameState.userApiKey, gameState.provider, gameState.model, gameState.customApiUrl]
+    [apiSettingsRef]
   );
 
   // On first load: restore save or auto-start character creation
@@ -227,7 +245,8 @@ function GamePageContent() {
       }
     } else {
       // New game: show character creation UI
-      startCharacterCreation();
+      // Pass settings directly since dispatch hasn't updated gameState yet
+      startCharacterCreation(settings);
     }
   }, []);
 
@@ -241,14 +260,18 @@ function GamePageContent() {
     return () => clearInterval(interval);
   }, [gameState]);
 
-  const startCharacterCreation = () => {
+  const startCharacterCreation = (settings?: { apiKey?: string; provider?: string; model?: string; customApiUrl?: string; language?: string }) => {
     dispatch({ type: 'SET_SHOW_CHARACTER_CREATION', payload: true });
-
-    // Call the DM with character_creation phase to get a welcome message
-    // The DM will output a short intro, then the inline card appears below
     dispatch({ type: 'SET_SCENE', payload: 'character_creation' });
 
-    const triggerMessage = gameState.language === 'zh'
+    // Use settings directly (React dispatch is async, gameState not yet updated)
+    const lang = settings?.language || gameState.language;
+    const key = settings?.apiKey || gameState.userApiKey;
+    const prov = settings?.provider || gameState.provider;
+    const mdl = settings?.model || gameState.model;
+    const url = settings?.customApiUrl || gameState.customApiUrl;
+
+    const triggerMessage = lang === 'zh'
       ? '开始游戏'
       : 'Start the game';
 
@@ -261,12 +284,12 @@ function GamePageContent() {
       try {
         for await (const chunk of streamChatMessage(
           [{ role: 'user', content: triggerMessage }],
-          gameState.language,
-          gameState.userApiKey,
+          lang,
+          key,
           'character_creation',
-          gameState.provider,
-          gameState.model,
-          gameState.customApiUrl
+          prov,
+          mdl,
+          url
         )) {
           fullResponse += chunk;
           dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
@@ -276,16 +299,24 @@ function GamePageContent() {
       } catch (error: any) {
         let errMsg = error.message || 'Unknown error';
         if (errMsg.includes('daily_limit')) {
-          errMsg = gameState.language === 'zh'
+          errMsg = lang === 'zh'
             ? '今日免费额度已用完（10次/天）。请点击右上角 🔑「API Key」配置自己的 Key 解除限制！'
             : 'Daily free limit reached (10/day). Click 🔑 "API Key" to configure your own key!';
           setTimeout(() => setShowApiKeyModal(true), 500);
         } else if (errMsg.includes('abort') || errMsg.includes('AbortError')) {
-          errMsg = gameState.language === 'zh'
+          errMsg = lang === 'zh'
             ? '请求超时。保底模型可能已不可用，请点击右上角「API Key」配置自己的 Key。'
             : 'Request timed out. Fallback model may be unavailable — please configure your own API key.';
+        } else if (errMsg.includes('balance') || errMsg.includes('depleted') || errMsg.includes('insufficient')) {
+          errMsg = lang === 'zh'
+            ? '保底模型余额不足。请点击右上角「API Key」配置自己的 Key。'
+            : 'Fallback model balance depleted. Please configure your own API key.';
+        } else if (errMsg.includes('401') || errMsg.includes('403')) {
+          errMsg = lang === 'zh'
+            ? 'API Key 无效或余额不足。请点击右上角「API Key」检查设置。'
+            : 'API key invalid or balance depleted. Please check settings.';
         } else {
-          errMsg = gameState.language === 'zh'
+          errMsg = lang === 'zh'
             ? `连接失败：${errMsg}`
             : `Connection failed: ${errMsg}`;
         }
@@ -599,14 +630,6 @@ function GamePageContent() {
                   {/* Inline cards after assistant messages */}
                   {msg.role === 'assistant' && (
                     <>
-                      {/* Character creation card */}
-                      {index === 0 && gameState.showCharacterCreation && (
-                        <InlineCharacterCreation
-                          language={lang}
-                          onComplete={handleCharacterCreated}
-                        />
-                      )}
-
                       {/* Inline notifications */}
                       {gameState.inlineEvents
                         .filter(e => e.afterMessageIndex === index)
@@ -648,6 +671,14 @@ function GamePageContent() {
                     className="whitespace-pre-wrap text-sm md:text-base"
                   />
                 </div>
+              )}
+
+              {/* Character creation card — appears after DM welcome message */}
+              {gameState.showCharacterCreation && !gameState.isStreaming && (
+                <InlineCharacterCreation
+                  language={lang}
+                  onComplete={handleCharacterCreated}
+                />
               )}
               {gameState.isStreaming && !currentStreamBuffer && displayMessages.length > 0 && (
                 <div className="mb-4 flex items-center gap-3 text-amber-400/60">
