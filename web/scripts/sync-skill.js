@@ -12,7 +12,11 @@ const syncMappings = [
   {
     src: path.join(__dirname, '..', '..', 'src', 'prompts'),
     dest: path.join(__dirname, '..', 'src', 'data', 'prompts'),
-    name: 'prompts'
+    name: 'prompts',
+    preserveDestFiles: [
+      path.join('phases', 'character_creation_zh.md'),
+      path.join('phases', 'character_creation_en.md'),
+    ],
   },
   {
     src: path.join(__dirname, '..', '..', 'src', 'rules'),
@@ -85,6 +89,25 @@ function removeRecursive(dir) {
   fs.rmdirSync(dir);
 }
 
+function snapshotFiles(baseDir, relFiles) {
+  const snapshot = new Map();
+  for (const relFile of relFiles || []) {
+    const absFile = path.join(baseDir, relFile);
+    if (fs.existsSync(absFile)) {
+      snapshot.set(relFile, fs.readFileSync(absFile, 'utf-8'));
+    }
+  }
+  return snapshot;
+}
+
+function restoreFiles(baseDir, snapshot) {
+  for (const [relFile, content] of snapshot.entries()) {
+    const absFile = path.join(baseDir, relFile);
+    fs.mkdirSync(path.dirname(absFile), { recursive: true });
+    fs.writeFileSync(absFile, content, 'utf-8');
+  }
+}
+
 /**
  * Main sync function
  */
@@ -96,6 +119,8 @@ function sync() {
 
   for (const mapping of syncMappings) {
     try {
+      const preserved = snapshotFiles(mapping.dest, mapping.preserveDestFiles);
+
       // Check if source exists
       if (!fs.existsSync(mapping.src)) {
         console.log(`⚠️  Skipping ${mapping.name}: source not found at ${mapping.src}`);
@@ -112,6 +137,11 @@ function sync() {
       // Copy files
       console.log(`  📁 Syncing ${mapping.name}...`);
       copyRecursive(mapping.src, mapping.dest);
+
+      if (preserved.size > 0) {
+        restoreFiles(mapping.dest, preserved);
+        console.log(`  🔒 Restored ${preserved.size} preserved file(s) for ${mapping.name}`);
+      }
 
       console.log(`  ✅ ${mapping.name} synced successfully\n`);
       successCount++;

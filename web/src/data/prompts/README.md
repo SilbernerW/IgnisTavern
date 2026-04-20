@@ -11,3 +11,9 @@ Editing rule:
 
 Quick check:
 - If you changed only web/src/data/prompts/**, your changes are not durable.
+
+Known preserved web-specific files:
+- web/src/data/prompts/phases/character_creation_zh.md
+- web/src/data/prompts/phases/character_creation_en.md
+
+These are intentionally preserved during sync to keep Web UI-driven character creation prompts.
