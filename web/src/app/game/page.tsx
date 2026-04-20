@@ -360,9 +360,9 @@ function GamePageContent() {
           </button>
           <button
             onClick={() => setShowApiKeyModal(true)}
-            className="text-amber-400/70 hover:text-amber-400 text-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-900/30 border border-amber-700/40 rounded-lg text-amber-400/80 text-sm hover:bg-amber-900/50 hover:text-amber-300 transition-all"
           >
-            {text.apiKey}
+            🔑 API
           </button>
           <LanguageSelector currentLang={lang} onChange={handleLanguageChange} size="sm" />
         </div>
