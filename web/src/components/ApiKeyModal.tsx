@@ -20,18 +20,18 @@ interface ApiKeyModalProps {
 
 const FALLBACK_INFO = {
   zh: {
-    provider: 'OpenRouter',
-    model: 'Free Router (自动选最佳免费模型)',
-    desc: '免费，自动路由到最佳可用模型',
-    speed: '~3-8 秒/回复',
-    quality: '⭐⭐⭐',
+    provider: '硅基流动 + OpenRouter 双线',
+    model: 'DeepSeek V3.2 → MiniMax M2.5',
+    desc: '自动切换：主用硅基流动，失败时切 OpenRouter',
+    speed: '~2-5 秒/回复',
+    quality: '⭐⭐⭐⭐',
   },
   en: {
-    provider: 'OpenRouter',
-    model: 'Free Router (auto-picks best free model)',
-    desc: 'Free, auto-routes to best available model',
-    speed: '~3-8 sec/response',
-    quality: '⭐⭐⭐',
+    provider: 'SiliconFlow + OpenRouter Dual',
+    model: 'DeepSeek V3.2 → MiniMax M2.5',
+    desc: 'Auto-switch: primary SiliconFlow, fallback OpenRouter',
+    speed: '~2-5 sec/response',
+    quality: '⭐⭐⭐⭐',
   },
 };
 
@@ -48,7 +48,7 @@ export default function ApiKeyModal({
 }: ApiKeyModalProps) {
   const [mode, setMode] = useState<ApiMode>('default');
   const [apiKey, setApiKey] = useState('');
-  const [providerId, setProviderId] = useState<ProviderId>('deepseek');
+  const [providerId, setProviderId] = useState<ProviderId>('openrouter');
   const [model, setModel] = useState('');
   const [customApiUrl, setCustomApiUrl] = useState('');
   const [showModelSuggestions, setShowModelSuggestions] = useState(false);
@@ -61,7 +61,7 @@ export default function ApiKeyModal({
       const detectedMode = currentMode || (currentKey ? 'custom' : 'default');
       setMode(detectedMode);
       setApiKey(currentKey || '');
-      setProviderId((currentProvider as ProviderId) || 'deepseek');
+      setProviderId((currentProvider as ProviderId) || 'openrouter');
       setModel(currentModel || '');
       setCustomApiUrl(currentCustomApiUrl || '');
       setLiveModels([]);
@@ -113,7 +113,7 @@ export default function ApiKeyModal({
       modeDefaultDesc: '使用免费保底模型，无需配置',
       modeCustom: '自定义模式',
       modeCustomDesc: '使用自己的 API Key，体验更佳',
-      defaultBanner: '⚠️ 默认模式使用免费模型路由，可能会出现角色设定偏差或叙事不稳定。强烈建议切换到自定义模式，使用更强的模型（如 GPT-5.4、Claude Opus 4.7、Gemini 3 Pro、GLM-5.1、Kimi K2.5、DeepSeek-V3 等）以获得最佳体验！',
+      defaultBanner: '⚠️ 默认模式使用双线保底（硅基流动 DeepSeek V3.2 + OpenRouter MiniMax M2.5），可能会出现角色设定偏差。建议切换自定义模式，使用更强的模型（如 GPT-5.4、Claude Opus 4.7 等）获得最佳体验！',
       fallbackInfo: '保底模型信息',
       fallbackProvider: '提供商',
       fallbackModel: '模型',
@@ -140,7 +140,7 @@ export default function ApiKeyModal({
       modeDefaultDesc: 'Use free fallback model, no setup needed',
       modeCustom: 'Custom',
       modeCustomDesc: 'Use your own API key for better experience',
-      defaultBanner: '⚠️ Default mode uses a free model router which may produce inaccurate character settings or unstable narratives. Strongly recommend switching to Custom mode with a stronger model (e.g. GPT-5.4, Claude Opus 4.7, Gemini 3 Pro, GLM-5.1, Kimi K2.5, DeepSeek-V3) for the best experience!',
+      defaultBanner: '⚠️ Default mode uses dual fallback (SiliconFlow DeepSeek V3.2 + OpenRouter MiniMax M2.5), may produce inaccurate settings. Switch to Custom mode with stronger models (e.g. GPT-5.4, Claude Opus 4.7) for best experience!',
       fallbackInfo: 'Fallback Model Info',
       fallbackProvider: 'Provider',
       fallbackModel: 'Model',
@@ -302,13 +302,7 @@ export default function ApiKeyModal({
                   type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder={
-                    providerId === 'cloudflare'
-                      ? language === 'zh'
-                        ? 'account_id:api_token（如 123abc:xyzToken）'
-                        : 'account_id:api_token (e.g. 123abc:xyzToken)'
-                      : provider.apiKeyHint
-                  }
+                  placeholder={provider.apiKeyHint}
                   className="w-full px-4 py-3 bg-slate-800 border border-amber-700/50 rounded-lg
                            text-amber-100 placeholder-amber-700/50
                            focus:outline-none focus:border-amber-500 transition-colors"
@@ -390,7 +384,7 @@ export default function ApiKeyModal({
               onSave?.({
                 apiKey: mode === 'custom' ? apiKey.trim() : '',
                 provider: mode === 'custom' ? providerId : 'openrouter',
-                model: mode === 'custom' ? (model.trim() || provider.defaultModel) : 'openrouter/free',
+                model: mode === 'custom' ? (model.trim() || provider.defaultModel) : 'deepseek-ai/DeepSeek-V3.2',
                 customApiUrl: mode === 'custom' ? customApiUrl.trim() : '',
                 mode,
               });
