@@ -6,9 +6,11 @@ interface CharacterSheetProps {
   character: Character;
   language: 'zh' | 'en';
   phase: string;
+  npcRelations?: { name: string; satisfaction: number; status: string }[];
+  mechanics?: { dayNumber: number; consecutiveRevenueDays: number; revenueTarget: number; todayRevenue: number; xp: number; inspectionPassed: boolean };
 }
 
-export default function CharacterSheet({ character, language, phase }: CharacterSheetProps) {
+export default function CharacterSheet({ character, language, phase, npcRelations, mechanics }: CharacterSheetProps) {
   const { name, nameEn, stats, skills, inventory } = character;
   const isCreated = stats.str > 0; // Character created when stats are non-zero
 
@@ -29,6 +31,16 @@ export default function CharacterSheet({ character, language, phase }: Character
       int: '心智',
       cha: '魅力',
       template: '模板',
+      npcRelations: 'NPC 关系',
+      day: '天数',
+      revenue: '今日营收',
+      revenueTarget: '目标',
+      xp: '经验',
+      npcLeft: '已离开',
+      npcActive: '在店',
+      inspection: '检查',
+      passed: '已通过',
+      notYet: '未通过',
     },
     en: {
       title: 'Character',
@@ -46,6 +58,16 @@ export default function CharacterSheet({ character, language, phase }: Character
       int: 'INT',
       cha: 'CHA',
       template: 'Template',
+      npcRelations: 'NPC Relations',
+      day: 'Day',
+      revenue: 'Revenue',
+      revenueTarget: 'Target',
+      xp: 'XP',
+      npcLeft: 'Left',
+      npcActive: 'Active',
+      inspection: 'Inspection',
+      passed: 'Passed',
+      notYet: 'Not yet',
     },
   };
 
@@ -152,7 +174,7 @@ export default function CharacterSheet({ character, language, phase }: Character
       )}
 
       {/* Inventory */}
-      <div>
+      <div className="mb-4">
         <h4 className="text-amber-400/80 text-xs font-bold mb-2 uppercase tracking-wider">
           {t.inventory}
         </h4>
@@ -172,6 +194,88 @@ export default function CharacterSheet({ character, language, phase }: Character
           <p className="text-amber-200/30 text-sm italic py-1">{t.emptyInventory}</p>
         )}
       </div>
+
+      {/* NPC Relations */}
+      {npcRelations && npcRelations.length > 0 && (
+        <div className="mb-4">
+          <h4 className="text-amber-400/80 text-xs font-bold mb-2 uppercase tracking-wider">
+            {t.npcRelations}
+          </h4>
+          <div className="space-y-2">
+            {npcRelations.map((npc) => (
+              <div key={npc.name} className="bg-slate-900/40 rounded-lg p-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-amber-200/80 text-sm font-medium capitalize">
+                    {npc.name === 'yu' ? '雨' : npc.name === 'huan' ? '焕' : npc.name === 'licht' ? '利希特' : npc.name}
+                  </span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${
+                    npc.status === 'active'
+                      ? 'bg-green-900/30 text-green-400/70 border border-green-700/30'
+                      : 'bg-red-900/30 text-red-400/70 border border-red-700/30'
+                  }`}>
+                    {npc.status === 'active' ? t.npcActive : t.npcLeft}
+                  </span>
+                </div>
+                {npc.status === 'active' && (
+                  <div className="h-1.5 bg-slate-800/70 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        npc.satisfaction >= 70
+                          ? 'bg-gradient-to-r from-green-600 to-green-400'
+                          : npc.satisfaction >= 40
+                          ? 'bg-gradient-to-r from-yellow-600 to-amber-400'
+                          : 'bg-gradient-to-r from-red-700 to-red-400'
+                      }`}
+                      style={{ width: `${npc.satisfaction}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Game Mechanics */}
+      {mechanics && (
+        <div>
+          <h4 className="text-amber-400/80 text-xs font-bold mb-2 uppercase tracking-wider">
+            📊 {t.day} {mechanics.dayNumber}
+          </h4>
+          <div className="grid grid-cols-2 gap-2">
+            {/* Revenue */}
+            <div className="bg-slate-900/40 rounded-lg p-2 text-center">
+              <div className="text-amber-500/60 text-xs mb-0.5">{t.revenue}</div>
+              <div className={`text-lg font-bold ${
+                mechanics.todayRevenue >= mechanics.revenueTarget
+                  ? 'text-green-400'
+                  : 'text-amber-100'
+              }`}>
+                {mechanics.todayRevenue}
+              </div>
+              <div className="text-amber-400/30 text-xs">{t.revenueTarget}: {mechanics.revenueTarget}</div>
+            </div>
+
+            {/* XP */}
+            <div className="bg-slate-900/40 rounded-lg p-2 text-center">
+              <div className="text-amber-500/60 text-xs mb-0.5">{t.xp}</div>
+              <div className="text-amber-100 text-lg font-bold">{mechanics.xp}</div>
+              {mechanics.inspectionPassed && (
+                <div className="text-green-400/60 text-xs">✓ {t.inspection}: {t.passed}</div>
+              )}
+            </div>
+          </div>
+
+          {/* Consecutive revenue days */}
+          {mechanics.consecutiveRevenueDays > 0 && (
+            <div className="mt-2 text-center">
+              <span className="text-xs text-amber-300/50">
+                🔥 {mechanics.consecutiveRevenueDays}x {language === 'zh' ? '连续达标' : 'streak'}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,22 +1,43 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { calculateRollResult, formatRollMessage, type DiceRollResult } from '@/lib/diceMachine';
 
 interface DiceRollerProps {
-  onRoll?: (result: number) => void;
-  disabled?: boolean;
-  locked?: boolean;
-  difficulty?: number;
-  checkLabel?: string;
+  onRoll: (result: number) => void;
+  disabled: boolean;
+  locked: boolean;        // true when no check is pending
+  difficulty: number | undefined;
+  checkLabel: string;
+  diceState: 'idle' | 'awaiting_roll' | 'roll_resolved';
+  statValue: number;      // character's stat for the check attribute
+  language: 'zh' | 'en';
 }
 
-export default function DiceRoller({ onRoll, disabled = false, locked = false, difficulty, checkLabel }: DiceRollerProps) {
+export default function DiceRoller({ 
+  onRoll, 
+  disabled = false, 
+  locked = false, 
+  difficulty,
+  checkLabel,
+  diceState,
+  statValue,
+  language = 'zh'
+}: DiceRollerProps) {
   const [isRolling, setIsRolling] = useState(false);
-  const [result, setResult] = useState<number | null>(null);
+  const [result, setResult] = useState<DiceRollResult | null>(null);
   const [displayNumber, setDisplayNumber] = useState(1);
 
+  // Reset result when entering awaiting_roll state (new check)
+  useEffect(() => {
+    if (diceState === 'awaiting_roll') {
+      setResult(null);
+      setDisplayNumber(1);
+    }
+  }, [diceState]);
+
   const rollDice = useCallback(() => {
-    if (isRolling || disabled || locked) return;
+    if (diceState !== 'awaiting_roll' || disabled || locked || isRolling) return;
 
     setIsRolling(true);
     setResult(null);
@@ -37,66 +58,100 @@ export default function DiceRoller({ onRoll, disabled = false, locked = false, d
         setTimeout(animate, delay);
       } else {
         // Final result
-        const finalResult = Math.floor(Math.random() * 20) + 1;
-        setDisplayNumber(finalResult);
-        setResult(finalResult);
+        const finalRoll = Math.floor(Math.random() * 20) + 1;
+        setDisplayNumber(finalRoll);
+        
+        // Calculate full result with modifiers
+        const rollResult = calculateRollResult(finalRoll, statValue, difficulty || 0);
+        setResult(rollResult);
         setIsRolling(false);
-        onRoll?.(finalResult);
+        
+        // Call onRoll with total
+        onRoll?.(rollResult.total);
       }
     };
 
     animate();
-  }, [isRolling, disabled, onRoll]);
+  }, [diceState, isRolling, disabled, locked, statValue, difficulty, onRoll]);
 
   const getResultColor = () => {
     if (result === null) return '';
-    if (difficulty !== undefined) {
-      return result >= difficulty ? 'text-green-400' : 'text-red-400';
+    return result.success ? 'text-green-400' : 'text-red-400';
+  };
+
+  const isInteractive = diceState === 'awaiting_roll' && !locked && !disabled && !isRolling;
+
+  // State-based button text
+  const getButtonText = () => {
+    if (diceState === 'idle') {
+      return language === 'zh' ? '等待检定...' : 'Awaiting check...';
     }
-    // Natural d20 scale
-    if (result >= 18) return 'text-yellow-400';
-    if (result >= 15) return 'text-green-400';
-    if (result >= 10) return 'text-amber-200';
-    if (result >= 5) return 'text-orange-400';
-    return 'text-red-400';
+    if (diceState === 'roll_resolved') {
+      return language === 'zh' ? '已解决' : 'Resolved';
+    }
+    if (isRolling) {
+      return language === 'zh' ? '投掷中...' : 'Rolling...';
+    }
+    if (locked) {
+      return language === 'zh' ? '🔒 等待检定' : '🔒 Awaiting check';
+    }
+    // awaiting_roll state
+    if (difficulty !== undefined) {
+      return language === 'zh' 
+        ? `🎲 掷骰 (DC${difficulty})` 
+        : `🎲 Roll (DC${difficulty})`;
+    }
+    return language === 'zh' ? '掷骰子' : 'Roll';
   };
 
-  const getSuccessText = () => {
-    if (result === null || difficulty === undefined) return null;
-    return result >= difficulty ? '成功!' : '失败';
-  };
-
-  const isInteractive = !locked && !disabled && !isRolling;
+  // Calculate modifier display
+  const modifier = statValue > 0 ? getModifier(statValue) : 0;
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      {/* Locked overlay */}
-      {locked && (
+    <div className={`
+      flex flex-col items-center gap-4 p-4 rounded-xl transition-all duration-300
+      ${diceState === 'idle' ? 'opacity-50' : 'opacity-100'}
+    `}>
+      {/* State indicator - idle state */}
+      {diceState === 'idle' && (
         <div className="text-center mb-1">
-          <div className="text-xs text-slate-500/70 italic">
-            {checkLabel ? `🔒 ${checkLabel}` : '🔒 等待DM指示投骰'}
+          <div className="text-sm text-slate-500/70 italic">
+            {language === 'zh' ? '等待检定...' : 'Awaiting check...'}
           </div>
         </div>
       )}
 
-      {/* Unlocked glow banner */}
-      {!locked && difficulty !== undefined && (
-        <div className="text-center mb-1 animate-pulse">
-          <div className="text-sm text-amber-300 font-bold">
-            🎲 {checkLabel || '检定'} DC {difficulty}
+      {/* Awaiting roll / Roll resolved banner */}
+      {diceState !== 'idle' && difficulty !== undefined && (
+        <div className={`text-center mb-1 ${diceState === 'awaiting_roll' ? 'animate-pulse' : ''}`}>
+          <div className={`text-sm font-bold ${diceState === 'awaiting_roll' ? 'text-amber-300' : 'text-slate-400'}`}>
+            🎲 {checkLabel || (language === 'zh' ? '检定' : 'Check')} DC {difficulty}
+          </div>
+          {/* Show modifier info */}
+          <div className="text-xs text-amber-200/60 mt-1">
+            {language === 'zh' 
+              ? `属性值: ${statValue} (${modifier >= 0 ? '+' : ''}${modifier})`
+              : `Stat: ${statValue} (${modifier >= 0 ? '+' : ''}${modifier})`}
           </div>
         </div>
       )}
 
       {/* Dice display */}
       <div className="relative">
-        {/* Glow effect */}
+        {/* Glow effect - success green or failure red */}
         <div className={`
           absolute inset-0 rounded-xl blur-md transition-opacity duration-300
-          ${isRolling ? 'opacity-70' : result !== null ? 'opacity-50' : 'opacity-0'}
-          ${result !== null ? (getResultColor().includes('green') || getResultColor().includes('yellow') 
-            ? 'bg-yellow-500/50' : 'bg-red-500/50') : 'bg-amber-500/50'}
+          ${isRolling ? 'opacity-70 bg-amber-500/50' : result !== null ? 'opacity-50' : 'opacity-0'}
+          ${result !== null ? (result.success ? 'bg-green-500/50' : 'bg-red-500/50') : ''}
         `} />
+
+        {/* Success/Failure glow animation */}
+        {diceState === 'roll_resolved' && result !== null && (
+          <div className={`
+            absolute inset-0 rounded-xl blur-xl animate-pulse
+            ${result.success ? 'bg-green-400/30' : 'bg-red-400/30'}
+          `} />
+        )}
         
         {/* Dice face */}
         <div className={`
@@ -106,8 +161,11 @@ export default function DiceRoller({ onRoll, disabled = false, locked = false, d
           flex items-center justify-center
           shadow-xl
           transition-all duration-300
-          ${locked ? 'border-slate-600/30 opacity-50' : 'border-amber-700/50'}
+          ${diceState === 'idle' ? 'border-slate-600/30 opacity-40' : 'border-amber-700/50'}
+          ${result?.success ? 'shadow-green-500/20 border-green-500/50' : ''}
+          ${result && !result.success ? 'shadow-red-500/20 border-red-500/50' : ''}
           ${isRolling ? 'scale-95' : isInteractive ? 'hover:scale-105 cursor-pointer' : 'scale-100'}
+          ${result && !result.success && !isRolling ? 'animate-shake' : ''}
         `}>
           {/* Inner bevel */}
           <div className="absolute inset-1 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900" />
@@ -116,10 +174,10 @@ export default function DiceRoller({ onRoll, disabled = false, locked = false, d
           <span className={`
             relative z-10 text-5xl md:text-6xl font-bold font-medieval
             transition-all duration-300
-            ${locked ? 'text-slate-600' : (getResultColor() || 'text-amber-100')}
+            ${diceState === 'idle' ? 'text-slate-600' : (getResultColor() || 'text-amber-100')}
             ${isRolling ? 'scale-110' : 'scale-100'}
           `}>
-            {locked ? '🔒' : displayNumber}
+            {diceState === 'idle' ? '🔒' : displayNumber}
           </span>
 
           {/* Corner decorations */}
@@ -139,44 +197,60 @@ export default function DiceRoller({ onRoll, disabled = false, locked = false, d
         )}
       </div>
 
-      {/* Success/failure text */}
-      {result !== null && difficulty !== undefined && (
-        <div className={`
-          text-xl font-bold font-medieval animate-bounce
-          ${result >= difficulty ? 'text-green-400' : 'text-red-400'}
-        `}>
-          {getSuccessText()}
+      {/* Roll calculation breakdown - shown after roll */}
+      {diceState === 'roll_resolved' && result !== null && (
+        <div className="text-center animate-fadeIn">
+          <div className={`
+            text-lg font-bold font-medieval
+            ${result.success ? 'text-green-400' : 'text-red-400'}
+          `}>
+            {result.success 
+              ? (language === 'zh' ? '成功!' : 'Success!')
+              : (language === 'zh' ? '失败' : 'Failure')
+            }
+          </div>
+          {/* Calculation: d20=X + modifier = total vs DC=Y */}
+          <div className="text-sm text-amber-200/80 mt-1 font-mono">
+            d20={result.roll} 
+            <span className={modifier >= 0 ? 'text-green-300' : 'text-red-300'}>
+              {modifier >= 0 ? '+' : ''}{modifier}
+            </span>
+            {' '}={result.total} vs DC{result.dc}
+          </div>
         </div>
       )}
 
-      {/* Difficulty indicator */}
-      {difficulty !== undefined && (
+      {/* Difficulty indicator - only show during awaiting_roll */}
+      {diceState === 'awaiting_roll' && difficulty !== undefined && (
         <div className="text-sm text-amber-300/70">
-          难度: {difficulty}
+          {language === 'zh' ? `难度: ${difficulty}` : `DC: ${difficulty}`}
         </div>
       )}
 
       {/* Roll button */}
       <button
         onClick={rollDice}
-        disabled={isRolling || disabled || locked}
+        disabled={!isInteractive}
         className={`
           relative px-6 py-3 font-medieval font-bold
           rounded-lg overflow-hidden
           transition-all duration-200
-          ${isRolling || disabled || locked
+          ${!isInteractive
             ? 'bg-slate-700 text-slate-500 cursor-not-allowed' 
-            : 'bg-gradient-to-r from-amber-700 to-orange-600 text-white hover:from-amber-600 hover:to-orange-500 hover:scale-105 active:scale-95 shadow-lg shadow-orange-900/30 animate-pulse'}
+            : 'bg-gradient-to-r from-amber-700 to-orange-600 text-white hover:from-amber-600 hover:to-orange-500 hover:scale-105 active:scale-95 shadow-lg shadow-orange-900/30 animate-pulse cursor-pointer'}
         `}
       >
         {/* Button glow */}
-        {!isRolling && !disabled && !locked && (
+        {isInteractive && (
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:animate-shimmer" />
         )}
-        <span className="relative z-10">
-          {locked ? '🔒 等待检定' : isRolling ? '投掷中...' : difficulty ? `🎲 掷骰 (DC${difficulty})` : '掷骰子'}
-        </span>
+        <span className="relative z-10">{getButtonText()}</span>
       </button>
     </div>
   );
+}
+
+// Helper to get modifier (same as in diceMachine)
+function getModifier(statValue: number): number {
+  return Math.floor((statValue - 10) / 2);
 }

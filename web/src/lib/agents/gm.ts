@@ -123,7 +123,7 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
   // ── Phase-specific closing reminder ──
   const phaseClosingMap: Record<string, Record<string, string>> = {
     zh: {
-      character_creation: '⚠️ 最后提醒：你现在是角色创建阶段！只帮玩家建角色，不要讲故事！展示完整角色卡后输出 [PHASE_TRANSITION:opening]',
+      character_creation: '⚠️ 最后提醒：输出简短欢迎词后立刻结束，不要引导创建流程。角色创建由前端 UI 处理。',
       opening: '⚠️ 最后提醒：1) 场景文件必须逐字使用 2) 输出🎲检定后立刻停笔，绝不接着写「如果成功…如果失败…」3) 给2-3个选项后等待玩家选择',
       act1: '⚠️ 最后提醒：1) 输出🎲检定后立刻停笔等玩家投骰 2) 追踪营收和NPC 3) 准备进入第二幕时输出 [PHASE_TRANSITION:act2]',
       act2: '⚠️ 最后提醒：1) 输出🎲检定后立刻停笔等玩家投骰 2) 逐步揭露真相 3) 准备进入第三幕时输出 [PHASE_TRANSITION:act3]',
@@ -131,7 +131,7 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
       ending: '⚠️ 最后提醒：1) 根据玩家的选择走向对应结局 2) 结局必须完整收束 3) 不要再输出 [PHASE_TRANSITION]',
     },
     en: {
-      character_creation: '⚠️ REMINDER: You are in CHARACTER CREATION! Only build the character, DO NOT narrate! After showing complete character sheet, output [PHASE_TRANSITION:opening]',
+      character_creation: '⚠️ REMINDER: Output a brief welcome message then STOP. Do not guide character creation — the front-end UI handles it.',
       opening: '⚠️ REMINDER: 1) Use scene file verbatim 2) After announcing 🎲 Check, STOP immediately — NEVER write "if you succeed/fail" 3) Give 2-3 options, then wait for player',
       act1: '⚠️ REMINDER: 1) After announcing 🎲 Check, STOP immediately and wait for player roll 2) Track revenue and NPCs 3) When ready for Act II output [PHASE_TRANSITION:act2]',
       act2: '⚠️ REMINDER: 1) After announcing 🎲 Check, STOP immediately and wait for player roll 2) Reveal truth gradually 3) When ready for Act III output [PHASE_TRANSITION:act3]',
