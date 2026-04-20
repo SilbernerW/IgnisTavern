@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "sync": "node scripts/sync-skill.js",
-    "dev": "node scripts/sync-skill.js && next dev",
-    "build": "node scripts/sync-skill.js && next build",
+    "check:consistency": "node scripts/check-consistency.js",
+    "sync": "node scripts/sync-skill.js && npm run check:consistency",
+    "dev": "npm run sync && next dev",
+    "build": "npm run sync && next build",
     "start": "next start",
     "lint": "next lint"
   },

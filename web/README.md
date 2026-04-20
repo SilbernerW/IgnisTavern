@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ignis Tavern Web
 
-## Getting Started
+Web version of Ignis Tavern (Next.js app router).
 
-First, run the development server:
+This version keeps the same narrative core as the Skill version, but moves critical mechanics to deterministic front-end/state logic:
+
+- interactive dice checks (state machine)
+- structured state tags (`[CHAR:...]`) parsed into game state
+- right-side character sheet synchronized from parsed state
+- inline event cards for HP/items/skills/XP
+
+## Local Development
 
 ```bash
+cd web
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run sync`
+	- syncs shared data from `../src` and `../assets`
+	- runs local consistency checks (must pass)
+- `npm run check:consistency`
+	- validates local consistency only (no copy)
+- `npm run dev`
+	- `sync` then starts Next dev server
+- `npm run build`
+	- `sync` then builds production bundle
 
-## Learn More
+## Local Consistency Guard
 
-To learn more about Next.js, take a look at the following resources:
+The local guard is implemented in `scripts/check-consistency.js` and currently checks:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. `src/prompts/web_dm_rules_{zh,en}.md` equals `web/src/data/prompts/web_dm_rules_{zh,en}.md`
+2. NPC dialogue files are paired as `_zh.md` + `_en.md` in both:
+	 - `src/npc/**/dialogue/`
+	 - `web/src/data/npc/**/dialogue/`
+3. legacy dialogue filenames without language suffix are rejected
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+If the guard fails, fix issues first, then rerun:
 
-## Deploy on Vercel
+```bash
+npm run check:consistency
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Data Source Rules
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Single source for Web DM rules: `src/prompts/web_dm_rules_zh.md` and `src/prompts/web_dm_rules_en.md`
+- `web/src/data/` is generated/synced local runtime data
+- shared scenes/rules/npc are synced from repository root `src/`
+
+## Key Files
+
+- `src/app/game/page.tsx` - main game loop UI + message handling
+- `src/lib/gameState.ts` - reducer + state model
+- `src/lib/diceMachine.ts` - dice parsing and result formatting
+- `src/lib/storage.ts` - local save/load
+- `src/lib/agents/gm.ts` - GM prompt composition
+- `scripts/sync-skill.js` - source-to-web sync
+- `scripts/check-consistency.js` - local gate checks
+
+## Known Note
+
+`next lint` may fail due to existing Next/ESLint compatibility in this repository setup. The local workflow for this project prioritizes `sync + check:consistency` as the gate.
