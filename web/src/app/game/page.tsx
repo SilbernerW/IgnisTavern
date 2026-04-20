@@ -119,51 +119,55 @@ function GamePageContent() {
       dispatch({ type: 'UPDATE_CHARACTER_STATS', payload: { ...character.stats, hp, maxHp: hp } });
       dispatch({ type: 'UPDATE_CHARACTER_SKILLS', payload: character.skills });
 
-      // Hide character creation, start the game
+      // Hide character creation
       setShowCharacterCreation(false);
+
+      // Set scene to opening BEFORE the API call
       dispatch({ type: 'SET_SCENE', payload: 'opening' });
       dispatch({ type: 'SET_ACT', payload: 1 });
 
-      // Trigger opening scene narration
-      startOpeningNarration();
-    },
-    []
-  );
+      // Send the opening trigger as a user message
+      // route.ts will detect phase=opening and inject the scene trigger
+      const triggerMessage = gameState.language === 'zh'
+        ? '角色已创建完成，请开始游戏'
+        : 'Character creation complete, start the game';
 
-  const startOpeningNarration = useCallback(
-    async () => {
+      dispatch({ type: 'ADD_USER_MESSAGE', payload: triggerMessage });
       dispatch({ type: 'SET_STREAMING', payload: true });
+      dispatch({ type: 'APPEND_STREAMING_TEXT', payload: '' });
 
-      const lang = gameState.language;
-      const key = gameState.userApiKey;
-      const prov = gameState.provider;
-      const mdl = gameState.model;
-      const url = gameState.customApiUrl;
+      // Use a ref-safe approach: directly call the API
+      (async () => {
+        let fullResponse = '';
+        try {
+          for await (const chunk of streamChatMessage(
+            [{ role: 'user', content: triggerMessage }],
+            gameState.language,
+            gameState.userApiKey,
+            'opening', // hardcode opening scene
+            gameState.provider,
+            gameState.model,
+            gameState.customApiUrl
+          )) {
+            fullResponse += chunk;
+            dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
+          }
+          const cleaned = stripAndParseTags(fullResponse, dispatch);
+          dispatch({ type: 'FINISH_STREAMING', payload: cleaned });
 
-      const triggerMessage = lang === 'zh'
-        ? '角色已创建完成。请按照场景文件原文，开始第一幕开场叙事。'
-        : 'Character creation is complete. Begin the Act I opening scene, using the scene file text verbatim.';
-
-      let fullResponse = '';
-      try {
-        for await (const chunk of streamChatMessage(
-          [{ role: 'user', content: triggerMessage }],
-          lang,
-          key,
-          'opening',
-          prov,
-          mdl,
-          url
-        )) {
-          fullResponse += chunk;
-          dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
+          // Check for dice check in opening
+          const check = parseDiceCheck(fullResponse);
+          if (check) {
+            dispatch({ type: 'SET_DICE_STATE', payload: 'awaiting_roll' });
+            dispatch({ type: 'SET_CURRENT_CHECK', payload: check });
+          }
+        } catch (error: any) {
+          const errMsg = gameState.language === 'zh'
+            ? `连接失败：${error.message || '未知错误'}`
+            : `Connection failed: ${error.message || 'Unknown error'}`;
+          dispatch({ type: 'FINISH_STREAMING', payload: errMsg });
         }
-        const cleaned = stripAndParseTags(fullResponse, dispatch);
-        dispatch({ type: 'FINISH_STREAMING', payload: cleaned });
-      } catch (error: any) {
-        const errMsg = lang === 'zh' ? `连接失败：${error.message || '未知错误'}` : `Connection failed: ${error.message || 'Unknown error'}`;
-        dispatch({ type: 'FINISH_STREAMING', payload: errMsg });
-      }
+      })();
     },
     [gameState.language, gameState.userApiKey, gameState.provider, gameState.model, gameState.customApiUrl]
   );
