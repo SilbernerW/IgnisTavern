@@ -31,6 +31,90 @@ function GamePageContent() {
 
   const hasInitialized = useRef(false);
 
+  /**
+   * Parse character sheet data from DM response text.
+   * Detects: name, template, STR/DEX/INT/CHA, HP, skills.
+   * Works with both Chinese and English output formats.
+   */
+  function parseCharacterFromResponse(
+    text: string,
+    dispatch: React.Dispatch<any>,
+    lang: 'zh' | 'en'
+  ) {
+    // Only parse if stats are still empty (character not yet created)
+    if (gameState.character.stats.str > 0) return;
+
+    // Detect template name
+    const templatePatterns = [
+      /角色卡[·\s]*([^\n]+)/, // 角色卡 · 调和者
+      /Character Sheet[·\s]*([^\n]+)/i, // Character Sheet · Mediator
+      /【([^】]+)】/, // 【调和者】
+    ];
+    for (const p of templatePatterns) {
+      const m = text.match(p);
+      if (m) {
+        const templateName = m[1].trim();
+        dispatch({
+          type: 'SET_CHARACTER_NAME',
+          payload: {
+            name: templateName,
+            nameEn: lang === 'en' ? templateName : '',
+          },
+        });
+        break;
+      }
+    }
+
+    // Detect stats — support multiple formats
+    // Chinese: 体魄 14(＋2)  or  体魄14
+    // English: STR 14(+2)   or  STR 14
+    const statPatterns = [
+      { key: 'str', patterns: [/体魄\s*(\d+)/, /STR\s*(\d+)/i] },
+      { key: 'dex', patterns: [/敏捷\s*(\d+)/, /DEX\s*(\d+)/i] },
+      { key: 'int', patterns: [/心智\s*(\d+)/, /INT\s*(\d+)/i] },
+      { key: 'cha', patterns: [/魅力\s*(\d+)/, /CHA\s*(\d+)/i] },
+    ];
+
+    const parsedStats: Record<string, number> = {};
+    let foundAny = false;
+    for (const { key, patterns } of statPatterns) {
+      for (const p of patterns) {
+        const m = text.match(p);
+        if (m) {
+          parsedStats[key] = parseInt(m[1]);
+          foundAny = true;
+          break;
+        }
+      }
+    }
+
+    if (foundAny) {
+      // Calculate HP: 5 + STR modifier
+      const strVal = parsedStats.str || 10;
+      const strMod = strVal >= 16 ? 3 : strVal >= 14 ? 2 : strVal >= 12 ? 1 : strVal >= 10 ? 0 : -1;
+      parsedStats.hp = 5 + strMod;
+      parsedStats.maxHp = 5 + strMod;
+
+      dispatch({ type: 'UPDATE_CHARACTER_STATS', payload: parsedStats });
+    }
+
+    // Detect skills
+    // Chinese: 技能：观察 ＋2（心智）、烹饪 ＋2（心智）
+    // English: Skills: Perception +2 (INT), Cooking +2 (INT)
+    const skillMatch = text.match(/技能[：:]\s*([^\n]+)/) || text.match(/Skills?[：:]\s*([^\n]+)/i);
+    if (skillMatch) {
+      const skillText = skillMatch[1];
+      // Split by various delimiters
+      const skills = skillText
+        .split(/[、,，;/]/)
+        .map(s => s.replace(/[＋+\-]\d+.*$/, '').trim()) // Remove modifier suffix
+        .filter(s => s.length > 0 && s.length < 20); // Sanity filter
+      if (skills.length > 0) {
+        dispatch({ type: 'UPDATE_CHARACTER_SKILLS', payload: skills });
+      }
+    }
+  }
+
   // On first load: restore save or auto-start character creation
   useEffect(() => {
     if (hasInitialized.current) return;
@@ -236,6 +320,11 @@ function GamePageContent() {
               else if (nextPhase === 'act3') dispatch({ type: 'SET_ACT', payload: 3 });
             }, 1500);
           }
+        }
+
+        // Parse character data from DM response (character creation phase)
+        if (gameState.currentScene === 'character_creation') {
+          parseCharacterFromResponse(fullResponse, dispatch, lang);
         }
       } catch (error: any) {
         let errMsg = error.message || 'Unknown error';
@@ -549,7 +638,7 @@ function GamePageContent() {
           </button>
 
           <div className="h-full p-4 flex flex-col gap-4 overflow-y-auto">
-            <CharacterSheet character={gameState.character} language={lang} />
+            <CharacterSheet character={gameState.character} language={lang} phase={gameState.currentScene} />
             {/* Dice roller — locked until DM requests a check */}
             <div id="dice-roller">
               <DiceRoller

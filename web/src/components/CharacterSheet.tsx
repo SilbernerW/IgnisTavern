@@ -1,15 +1,16 @@
 'use client';
 
-import CharacterPortrait from './CharacterPortrait';
 import { Character } from '@/lib/gameState';
 
 interface CharacterSheetProps {
   character: Character;
   language: 'zh' | 'en';
+  phase: string;
 }
 
-export default function CharacterSheet({ character, language }: CharacterSheetProps) {
-  const { name, nameEn, stats, inventory } = character;
+export default function CharacterSheet({ character, language, phase }: CharacterSheetProps) {
+  const { name, nameEn, stats, skills, inventory } = character;
+  const isCreated = stats.str > 0; // Character created when stats are non-zero
 
   const texts = {
     zh: {
@@ -18,7 +19,16 @@ export default function CharacterSheet({ character, language }: CharacterSheetPr
       luck: '幸运',
       reputation: '声望',
       inventory: '背包',
+      skills: '技能',
       emptyInventory: '空',
+      emptySkills: '无',
+      notCreated: '角色未创建',
+      notCreatedHint: '完成角色创建后将在此显示',
+      str: '体魄',
+      dex: '敏捷',
+      int: '心智',
+      cha: '魅力',
+      template: '模板',
     },
     en: {
       title: 'Character',
@@ -26,104 +36,140 @@ export default function CharacterSheet({ character, language }: CharacterSheetPr
       luck: 'Luck',
       reputation: 'Reputation',
       inventory: 'Inventory',
+      skills: 'Skills',
       emptyInventory: 'Empty',
+      emptySkills: 'None',
+      notCreated: 'No Character Yet',
+      notCreatedHint: 'Will appear after character creation',
+      str: 'STR',
+      dex: 'DEX',
+      int: 'INT',
+      cha: 'CHA',
+      template: 'Template',
     },
   };
 
   const t = texts[language];
 
-  const hpPercent = (stats.hp / stats.maxHp) * 100;
+  // Before character creation — show placeholder
+  if (!isCreated) {
+    return (
+      <div className="bg-slate-800/50 border border-amber-700/30 rounded-xl p-4 md:p-5">
+        <div className="text-center py-8">
+          <div className="text-4xl mb-3 opacity-30">👤</div>
+          <h3 className="text-amber-400/50 font-medium mb-2">{t.notCreated}</h3>
+          <p className="text-amber-200/30 text-sm">{t.notCreatedHint}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const hpPercent = stats.maxHp > 0 ? (stats.hp / stats.maxHp) * 100 : 0;
+
+  // Helper: get modifier from stat value
+  const getMod = (val: number) => {
+    if (val >= 16) return '+3';
+    if (val >= 14) return '+2';
+    if (val >= 12) return '+1';
+    if (val >= 10) return '+0';
+    if (val >= 8) return '-1';
+    return '-2';
+  };
 
   return (
     <div className="bg-slate-800/50 border border-amber-700/30 rounded-xl p-4 md:p-5">
-      {/* Header with portrait */}
+      {/* Header */}
       <div className="flex items-start gap-4 mb-5">
-        <CharacterPortrait
-          characterName={name}
-          characterNameEn={nameEn}
-          size="md"
-          frame="wood"
-        />
-        
+        <div className="w-14 h-14 rounded-lg bg-slate-900/70 border border-amber-700/30 flex items-center justify-center text-2xl">
+          ⚔️
+        </div>
         <div className="flex-1 pt-1">
-          <h3 className="text-amber-400 font-medieval text-xl mb-1">{name}</h3>
-          <p className="text-amber-200/50 text-sm italic">{nameEn}</p>
+          <h3 className="text-amber-400 font-bold text-lg mb-0.5">{name || '???'}</h3>
+          {nameEn && nameEn !== name && (
+            <p className="text-amber-200/40 text-xs italic">{nameEn}</p>
+          )}
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="space-y-4 mb-5">
-        {/* HP Bar */}
-        <div>
-          <div className="flex justify-between text-sm mb-1.5">
-            <span className="text-amber-200/70">{t.hp}</span>
-            <span className="text-amber-100 font-medium">
-              {stats.hp}/{stats.maxHp}
-            </span>
-          </div>
-          <div className="h-2.5 bg-slate-900/70 rounded-full overflow-hidden">
-            <div
-              className={`
-                h-full rounded-full transition-all duration-500
-                ${hpPercent > 50 
-                  ? 'bg-gradient-to-r from-green-600 to-green-500' 
-                  : hpPercent > 25 
-                    ? 'bg-gradient-to-r from-yellow-600 to-orange-500'
-                    : 'bg-gradient-to-r from-red-700 to-red-500'}
-              `}
-              style={{ width: `${hpPercent}%` }}
-            />
-          </div>
+      {/* HP Bar */}
+      <div className="mb-4">
+        <div className="flex justify-between text-sm mb-1.5">
+          <span className="text-amber-200/70">{t.hp}</span>
+          <span className="text-amber-100 font-medium">
+            {stats.hp}/{stats.maxHp}
+          </span>
         </div>
-
-        {/* Attribute scores */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-slate-900/50 rounded-lg p-3 text-center">
-            <div className="text-amber-500/70 text-xs mb-1 uppercase tracking-wider">
-              {language === 'zh' ? '体魄' : 'STR'}
-            </div>
-            <div className="text-amber-100 text-xl font-bold">{stats.str}</div>
-          </div>
-          <div className="bg-slate-900/50 rounded-lg p-3 text-center">
-            <div className="text-amber-500/70 text-xs mb-1 uppercase tracking-wider">
-              {language === 'zh' ? '敏捷' : 'DEX'}
-            </div>
-            <div className="text-amber-100 text-xl font-bold">{stats.dex}</div>
-          </div>
-          <div className="bg-slate-900/50 rounded-lg p-3 text-center">
-            <div className="text-amber-500/70 text-xs mb-1 uppercase tracking-wider">
-              {language === 'zh' ? '心智' : 'INT'}
-            </div>
-            <div className="text-amber-100 text-xl font-bold">{stats.int}</div>
-          </div>
-          <div className="bg-slate-900/50 rounded-lg p-3 text-center">
-            <div className="text-amber-500/70 text-xs mb-1 uppercase tracking-wider">
-              {language === 'zh' ? '魅力' : 'CHA'}
-            </div>
-            <div className="text-amber-100 text-xl font-bold">{stats.cha}</div>
-          </div>
+        <div className="h-2.5 bg-slate-900/70 rounded-full overflow-hidden">
+          <div
+            className={`
+              h-full rounded-full transition-all duration-500
+              ${hpPercent > 50
+                ? 'bg-gradient-to-r from-green-600 to-green-500'
+                : hpPercent > 25
+                  ? 'bg-gradient-to-r from-yellow-600 to-orange-500'
+                  : 'bg-gradient-to-r from-red-700 to-red-500'}
+            `}
+            style={{ width: `${Math.max(hpPercent, 2)}%` }}
+          />
         </div>
       </div>
+
+      {/* Attribute scores */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        {[
+          { key: 'str', label: t.str, val: stats.str },
+          { key: 'dex', label: t.dex, val: stats.dex },
+          { key: 'int', label: t.int, val: stats.int },
+          { key: 'cha', label: t.cha, val: stats.cha },
+        ].map(attr => (
+          <div key={attr.key} className="bg-slate-900/50 rounded-lg p-2.5 text-center">
+            <div className="text-amber-500/60 text-xs mb-0.5 uppercase tracking-wider">
+              {attr.label}
+            </div>
+            <div className="text-amber-100 text-lg font-bold">{attr.val}</div>
+            <div className="text-amber-400/40 text-xs">{getMod(attr.val)}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Skills */}
+      {skills.length > 0 && (
+        <div className="mb-4">
+          <h4 className="text-amber-400/80 text-xs font-bold mb-2 uppercase tracking-wider">
+            {t.skills}
+          </h4>
+          <div className="flex flex-wrap gap-1.5">
+            {skills.map((skill, i) => (
+              <span
+                key={i}
+                className="px-2 py-0.5 bg-amber-900/30 border border-amber-700/30 rounded text-amber-200/70 text-xs"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Inventory */}
       <div>
-        <h4 className="text-amber-400/80 font-medieval text-sm mb-2 uppercase tracking-wider">
+        <h4 className="text-amber-400/80 text-xs font-bold mb-2 uppercase tracking-wider">
           {t.inventory}
         </h4>
         {inventory.length > 0 ? (
-          <ul className="space-y-1.5">
+          <ul className="space-y-1">
             {inventory.map((item, index) => (
               <li
                 key={index}
-                className="text-amber-100/70 text-sm flex items-center gap-2 py-1.5 px-2 bg-slate-900/30 rounded"
+                className="text-amber-100/60 text-sm flex items-center gap-2 py-1 px-2 bg-slate-900/30 rounded"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-600/50" />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-600/40" />
                 {item}
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-amber-200/40 text-sm italic py-2">{t.emptyInventory}</p>
+          <p className="text-amber-200/30 text-sm italic py-1">{t.emptyInventory}</p>
         )}
       </div>
     </div>

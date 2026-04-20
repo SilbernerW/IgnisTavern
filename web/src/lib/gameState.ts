@@ -43,18 +43,18 @@ export interface GameState {
 }
 
 const defaultCharacter: Character = {
-  name: '酒馆老板',
-  nameEn: 'Tavern Keeper',
+  name: '',
+  nameEn: '',
   stats: {
-    str: 10,
-    dex: 10,
-    int: 10,
-    cha: 10,
-    hp: 6,
-    maxHp: 6,
+    str: 0,
+    dex: 0,
+    int: 0,
+    cha: 0,
+    hp: 0,
+    maxHp: 0,
   },
   skills: [],
-  inventory: ['一本破旧的账本', '神秘的钥匙'],
+  inventory: [],
 };
 
 export const createInitialGameState = (): GameState => ({
@@ -87,6 +87,10 @@ export const gameStateReducer = (
     | { type: 'SET_MODEL'; payload: string }
     | { type: 'SET_CUSTOM_API_URL'; payload: string }
     | { type: 'SET_API_MODE'; payload: 'default' | 'custom' }
+    | { type: 'UPDATE_CHARACTER_STATS'; payload: Partial<Character['stats']> }
+    | { type: 'UPDATE_CHARACTER_SKILLS'; payload: string[] }
+    | { type: 'UPDATE_CHARACTER_INVENTORY'; payload: string[] }
+    | { type: 'SET_CHARACTER_NAME'; payload: { name: string; nameEn: string } }
     | { type: 'RESET_STATE' }
 ): GameState => {
   switch (action.type) {
@@ -136,6 +140,14 @@ export const gameStateReducer = (
       return { ...state, customApiUrl: action.payload };
     case 'SET_API_MODE':
       return { ...state, apiMode: action.payload };
+    case 'UPDATE_CHARACTER_STATS':
+      return { ...state, character: { ...state.character, stats: { ...state.character.stats, ...action.payload } } };
+    case 'UPDATE_CHARACTER_SKILLS':
+      return { ...state, character: { ...state.character, skills: action.payload } };
+    case 'UPDATE_CHARACTER_INVENTORY':
+      return { ...state, character: { ...state.character, inventory: action.payload } };
+    case 'SET_CHARACTER_NAME':
+      return { ...state, character: { ...state.character, name: action.payload.name, nameEn: action.payload.nameEn } };
     case 'RESET_STATE':
       return createInitialGameState();
     default:
