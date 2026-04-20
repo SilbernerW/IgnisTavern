@@ -6,19 +6,16 @@ type GamePhase = 'character_creation' | 'opening' | 'act1' | 'act2' | 'act3';
 /**
  * Build the GM system prompt for the web version.
  *
- * Strategy: dump ALL relevant content into one system prompt, just like the skill
- * version does with SKILL.md. Small models need full context to avoid hallucination —
- * cherry-picking files per phase causes more problems than it solves.
- *
- * Prompt composition order:
- *   1. system_{lang}.md         — DM persona + core responsibilities
- *   2. dm_behavior_{lang}.md    — detailed behavior rules (NPC, choices, pacing, templates)
- *   3. web_dm_rules_{lang}.md   — web-specific rules (dice, identity, scene verbatim)
+ * Composition order (optimized for small models):
+ *   1. system_{lang}.md         — DM persona + ABSOLUTE RULES (primacy effect)
+ *   2. dm_behavior_{lang}.md    — behavioral constraints (no settings/rules/numbers)
+ *   3. web_dm_rules_{lang}.md   — web-specific rules
  *   4. phases/{phase}_{lang}.md — current phase instructions
- *   5. world_{lang}.md          — world setting
- *   6. characters/*_{lang}.md   — ALL NPC details (no spoiler gating — model needs context)
- *   7. RULES_{lang}.md          — full game rules
+ *   5. world_{lang}.md          — world setting (spoilers gated)
+ *   6. characters/*_{lang}.md   — NPC details
+ *   7. RULES_{lang}.md          — game rules (DC, HP, skills, etc.)
  *   8. scenes/act*_{lang}.md    — current scene script
+ *   9. ABSOLUTE RULES repeat    — restate top 5 rules at the end (recency effect)
  */
 export function buildGMPrompt(language: string, phase: GamePhase = 'character_creation'): string {
   const lang = language === 'zh' ? 'zh' : 'en';
@@ -33,23 +30,22 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
     }
   }
 
-  // 1. Base DM system prompt
+  // 1. Base DM system prompt (contains ABSOLUTE RULES at top)
   const systemPrompt = readDataFile('prompts', `system_${lang}.md`);
 
-  // 2. Detailed DM behavior rules
+  // 2. Behavioral constraints
   const dmBehavior = readDataFile('prompts', `dm_behavior_${lang}.md`);
 
-  // 3. Web-specific DM rules
+  // 3. Web-specific rules
   const webRules = readDataFile('prompts', `web_dm_rules_${lang}.md`);
 
   // 4. Phase-specific instructions
   const phaseInstructions = readDataFile('prompts', 'phases', `${phase}_${lang}.md`);
 
-  // 5. World setting
+  // 5. World setting (spoilers gated in "DM Internal Reference" section)
   const worldSetting = readDataFile('prompts', `world_${lang}.md`);
 
-  // 6. ALL character files — include even during character creation
-  // Small models need full NPC context to not hallucinate (e.g. Licht = seal)
+  // 6. ALL character files
   const charactersDir = path.join(dataDir, 'prompts', 'characters');
   let characterTexts = '';
   try {
@@ -57,9 +53,7 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
     for (const file of charFiles) {
       characterTexts += '\n\n---\n\n' + fs.readFileSync(path.join(charactersDir, file), 'utf-8');
     }
-  } catch {
-    // Characters directory might not exist
-  }
+  } catch {}
 
   // 7. Full game rules
   const rules = readDataFile('rules', `RULES_${lang}.md`);
@@ -81,7 +75,12 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
     sceneLabel = lang === 'zh' ? sceneInfo.labelZh : sceneInfo.labelEn;
   }
 
-  // Compose — dump everything, let the model figure it out
+  // 9. Repeated absolute rules at the end (recency effect for small models)
+  const closingReminder = lang === 'zh'
+    ? `\n\n---\n\n## ⚠️ 再次提醒（必须遵守）\n\n1. Licht 是海豹，不是人。用"它"，描述鳍足和圆滚滚的身体\n2. 不剧透——当前阶段未揭示的内容绝口不提\n3. 不自己投骰——宣布检定后停下来等玩家\n4. 场景文件是真相源——逐字使用，不得改写\n5. 你是DM，不是AI`
+    : `\n\n---\n\n## ⚠️ REMINDER (Must Follow)\n\n1. Licht is a SEAL, not a human. Use "it", describe flippers and round body\n2. No spoilers — never mention content not yet revealed in the current act\n3. Never roll dice yourself — announce check then STOP and wait\n4. Scene files are source of truth — use verbatim, do not paraphrase\n5. You are the DM, not an AI`;
+
+  // Compose
   const parts: string[] = [];
 
   if (systemPrompt) parts.push(systemPrompt);
@@ -92,6 +91,7 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
   if (characterTexts) parts.push('\n\n## 角色设定\n\n' + characterTexts);
   if (rules) parts.push('\n\n## 游戏规则\n\n' + rules);
   if (sceneText) parts.push(`\n\n## 当前场景：${sceneLabel}\n\n【重要：以下内容必须逐字使用，不得改写】\n\n${sceneText}`);
+  parts.push(closingReminder);
 
   return parts.join('');
 }

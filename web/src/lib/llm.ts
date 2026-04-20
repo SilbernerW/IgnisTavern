@@ -25,7 +25,7 @@ export async function streamChatCompletion(
     model,
     provider: explicitProvider,
     customApiUrl,
-    temperature = 0.8,
+    temperature = 0.4,
     maxTokens = 4096,
   } = options;
 
@@ -129,7 +129,7 @@ async function streamAnthropic(
   onChunk: (text: string) => void,
   onDone: () => void
 ): Promise<void> {
-  const { apiKey, messages, model, temperature = 0.8, maxTokens = 4096 } = options;
+  const { apiKey, messages, model, temperature = 0.4, maxTokens = 4096 } = options;
   const provider = PROVIDERS.anthropic;
   const modelName = model || provider.defaultModel;
 
