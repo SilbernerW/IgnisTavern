@@ -84,8 +84,10 @@ Your tavern is failing. Three eccentric employees are already here — on probat
 
 2. **配置环境变量** Set up environment (optional, for free fallback model):
    ```bash
+   # If web/.env.example exists:
    cp web/.env.example web/.env.local
-   # Edit .env.local with your fallback API keys
+
+   # If not, create web/.env.local manually and set fallback API keys.
    ```
 
 3. **启动开发服务器** Start dev server:
@@ -129,7 +131,7 @@ Your tavern is failing. Three eccentric employees are already here — on probat
 2. **角色创建** — 前端内嵌卡片，选择模板或问答生成
 3. **开场叙事** — DM 按场景文件描述第一幕
 4. **游戏循环** — 玩家行动 → DM 叙事 → 检定/物品/HP 内嵌卡片 → 继续
-5. **三幕推进** — 自动切换场景和阶段
+5. **阶段推进** — 按实现进度切换场景与阶段（当前以第一幕流程为稳定基线）
 
 ### Skill 版流程
 
@@ -137,7 +139,7 @@ Your tavern is failing. Three eccentric employees are already here — on probat
 2. **创建角色** — DM 引导选择模板或问答
 3. **第一幕** — 经营酒馆，赢得三位员工的信任
 4. **资格确认** — 达成连续3天达标
-5. **第二/三幕** — 调查真相，面对最终抉择
+5. **第二/三幕** — 开发中（当前 Skill 原型默认到第一幕结束）
 
 ---
 
@@ -151,7 +153,7 @@ ignis-tavern/
 │   ├── prompts/                # AI prompts & world-building
 │   │   ├── system_zh/en.md     # DM system prompt
 │   │   ├── dm_behavior_zh/en.md
-│   │   ├── web_dm_rules_zh/en.md  # Web DM rules (plain-text state tracking)
+│   │   ├── web_dm_rules_zh/en.md  # Web DM rules (structured [CHAR:...] tag protocol)
 │   │   ├── world_zh/en.md      # World setting
 │   │   ├── characters/         # NPC profiles (huan, licht, yu)
 │   │   └── phases/             # Phase-specific instructions
@@ -202,28 +204,44 @@ ignis-tavern/
 
 ## 项目状态 / Project Status
 
-### Story Content ✅
-- **Act I**: Opening + tavern management + qualification (中文/English)
-- **Act II**: Investigation (3 branches) + revelation (中文/English)
-- **Act III**: Confrontation + 7 endings (中文/English)
-- **NPC Dialogue**: Huan, Licht, Yu — Act II dialogues complete
+Status labels used in this section:
+- **Verified** — Implemented and confirmed in the current repository
+- **In Progress** — Partially implemented or under active iteration
+- **Planned** — Design target, not in default playable flow yet
 
-### Web App 🔄
-- ✅ Progressive prompt loading (opening phase 4.4k tokens, -63%)
-- ✅ Front-end driven character creation (template + quiz)
-- ✅ Dice state machine (idle → awaiting_roll → roll_resolved)
-- ✅ Inline cards (dice check, item notifications, HP changes)
-- ✅ Side panel character sheet (stats, skills, NPC relations, revenue)
-- ✅ Server-side API with provider fallback + rate limiting
-- 🔄 Bug fixes in progress (dice flow, startup sequence, model selection)
-- ⏳ Visual polish and animations
-- ⏳ Save/load system improvements
+### Story Content
 
-### Data Sync ✅
-- `scenes/`, `rules/`, `npc/` — identical between skill and web versions
-- `prompts/phases/act2` — synced (web's detailed scene descriptions)
-- `prompts/web_dm_rules` — intentionally different (tags vs plain text)
-- `prompts/phases/character_creation` — intentionally different (UI vs LLM driven)
+| Scope | Status | Notes |
+|------|--------|-------|
+| **Act I** | **Verified** | Opening + tavern management + qualification are playable in current flow (中文/English) |
+| **Act II** | **In Progress** | Investigation/revelation content exists, but not yet part of the default Skill playable endpoint |
+| **Act III** | **Planned** | Ending design exists; full production integration is not in the default playable flow |
+| **NPC Dialogue (Act II)** | **In Progress** | Dialogue files exist but are not fully finalized across all NPC branches |
+
+### Web App
+
+| Scope | Status | Notes |
+|------|--------|-------|
+| Progressive prompt loading | **Verified** | Opening phase payload reduced via phase-based loading |
+| Front-end character creation | **Verified** | Template + quiz creation handled by UI cards |
+| Dice state machine | **Verified** | `idle -> awaiting_roll -> roll_resolved` flow implemented |
+| Inline cards and side sheet | **Verified** | Dice/item/HP cards + right-side character sheet in use |
+| Provider fallback + free quota limit | **Verified** | Server-side fallback and daily free-tier limit are implemented |
+| Dice flow/startup/model fixes | **In Progress** | Ongoing stabilization and edge-case fixes |
+| Visual polish & animations | **In Progress** | UX polish still under iteration |
+| Save/load robustness | **In Progress** | Save/load behavior is available and being improved |
+
+### Data Sync
+
+| Scope | Status | Notes |
+|------|--------|-------|
+| `scenes/` + `rules/` shared content | **Verified** | Synced from `src/` into `web/src/data/` via sync script |
+| `npc/` shared content | **In Progress** | Intended to be synced from `src/`; parity is being normalized |
+| `prompts/phases/act2` | **In Progress** | Kept aligned during content iteration |
+| `prompts/web_dm_rules` | **Verified** | Single source in `src/prompts/`; sync copies it directly into web data |
+| `prompts/phases/character_creation` | **In Progress** | Version-specific behavior currently exists and is being normalized |
+
+For local development, run `cd web && npm run sync` before verifying data parity.
 
 ---
 

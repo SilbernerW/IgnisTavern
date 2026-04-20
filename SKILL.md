@@ -39,7 +39,7 @@ Display this when a new session begins:
 
 ## 📖 Session Flow
 
-This is the complete flow for a full 1-2 hour session. Follow each step in order.
+This is the current playable flow (Act I + Act II). Follow each step in order.
 
 ### Step 0: Language Selection
 
@@ -347,7 +347,7 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 
 ### Future Expansion
 
-**Act III — The Choice**: The Trolley Problem — save the found family, or save the city. No correct answer. Both choices have permanent, devastating consequences. Act III is fully scripted with 7 distinct endings.
+**Act III — The Choice**: The Trolley Problem — save the found family, or save the city. No correct answer. Both choices have permanent, devastating consequences. Act III is currently planned and under development.
 
 ---
 

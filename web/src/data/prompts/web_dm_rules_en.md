@@ -74,16 +74,16 @@ When showing the character card, output full tags after the card text:
 
 ```
 ══════════════════════════════════
-  Character Card · Action Guy
+	Character Card · Action Guy
 ══════════════════════════════════
-  HP: 5
+	HP: 5
 
-  STR 10(±0)   Carrying capacity
-  DEX 14(+2)  Dodge/Speed ★
-  INT 10(±0)   Knowledge/Cooking
-  CHA 12(+1)  Social/Trading
+	STR 10(±0)   Carrying capacity
+	DEX 14(+2)  Dodge/Speed ★
+	INT 10(±0)   Knowledge/Cooking
+	CHA 12(+1)  Social/Trading
 
-  Skills: Sleight of Hand +2, Stealth +2, Performance +1 (DEX)
+	Skills: Sleight of Hand +2, Stealth +2, Performance +1 (DEX)
 ══════════════════════════════════
 
 [CHAR:name=Action Guy]
