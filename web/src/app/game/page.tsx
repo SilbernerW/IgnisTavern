@@ -3,12 +3,13 @@
 import { useState, useReducer, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CharacterSheet from '@/components/CharacterSheet';
-import DiceRoller from '@/components/DiceRoller';
+import InlineCharacterCreation from '@/components/InlineCharacterCreation';
+import InlineDiceCheck from '@/components/InlineDiceCheck';
+import InlineNotification from '@/components/InlineNotification';
 import ChatInput from '@/components/ChatInput';
 import StreamingText from '@/components/StreamingText';
 import LanguageSelector from '@/components/LanguageSelector';
 import ApiKeyModal from '@/components/ApiKeyModal';
-import CharacterCreation from '@/components/CharacterCreation';
 import {
   GameState,
   createInitialGameState,
@@ -26,7 +27,6 @@ function GamePageContent() {
   const [gameState, dispatch] = useReducer(gameStateReducer, createInitialGameState());
   const [showSidePanel, setShowSidePanel] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  const [showCharacterCreation, setShowCharacterCreation] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
 
   const hasInitialized = useRef(false);
@@ -40,6 +40,8 @@ function GamePageContent() {
     text: string,
     dispatchFn: React.Dispatch<any>,
   ): string {
+    const msgIndex = gameState.messages.length;
+
     // Parse [CHAR:...] tags for in-game updates
     const tagRegex = /\[CHAR:(\w+)=([^\]]+)\]/g;
     let match: RegExpExecArray | null;
@@ -55,30 +57,54 @@ function GamePageContent() {
             const hp = parseInt(hpMatch[1]);
             const maxHp = parseInt(hpMatch[2]);
             if (hp >= 0 && maxHp > 0 && hp <= maxHp) {
+              const oldHp = gameState.character.stats.hp;
               dispatchFn({ type: 'UPDATE_CHARACTER_STATS', payload: { hp, maxHp } });
+              if (hp !== oldHp) {
+                dispatchFn({ type: 'ADD_INLINE_EVENT', payload: {
+                  id: `hp-${Date.now()}`, type: 'hp_change' as const,
+                  value: `${oldHp} → ${hp}`, afterMessageIndex: msgIndex,
+                }});
+              }
             }
           }
           break;
         }
         case 'item+': {
           dispatchFn({ type: 'ADD_INVENTORY_ITEM', payload: value });
+          dispatchFn({ type: 'ADD_INLINE_EVENT', payload: {
+            id: `item+-${Date.now()}`, type: 'item_add' as const,
+            value, afterMessageIndex: msgIndex,
+          }});
           break;
         }
         case 'item-': {
           dispatchFn({ type: 'REMOVE_INVENTORY_ITEM', payload: value });
+          dispatchFn({ type: 'ADD_INLINE_EVENT', payload: {
+            id: `item--${Date.now()}`, type: 'item_remove' as const,
+            value, afterMessageIndex: msgIndex,
+          }});
           break;
         }
         case 'skill+': {
           dispatchFn({ type: 'ADD_CHARACTER_SKILL', payload: value });
+          dispatchFn({ type: 'ADD_INLINE_EVENT', payload: {
+            id: `skill+-${Date.now()}`, type: 'skill_add' as const,
+            value, afterMessageIndex: msgIndex,
+          }});
           break;
         }
         case 'xp': {
           const xp = parseInt(value);
-          if (xp > 0) dispatchFn({ type: 'ADD_XP', payload: xp });
+          if (xp > 0) {
+            dispatchFn({ type: 'ADD_XP', payload: xp });
+            dispatchFn({ type: 'ADD_INLINE_EVENT', payload: {
+              id: `xp-${Date.now()}`, type: 'xp' as const,
+              value: xp, afterMessageIndex: msgIndex,
+            }});
+          }
           break;
         }
         case 'npc+': {
-          // npc name, satisfaction change: e.g. [CHAR:npc+=yu:5] means +5 satisfaction
           const npcMatch = value.match(/^(\w+):(-?\d+)$/);
           if (npcMatch) {
             const npcName = npcMatch[1];
@@ -120,7 +146,7 @@ function GamePageContent() {
       dispatch({ type: 'UPDATE_CHARACTER_SKILLS', payload: character.skills });
 
       // Hide character creation
-      setShowCharacterCreation(false);
+      dispatch({ type: 'SET_SHOW_CHARACTER_CREATION', payload: false });
 
       // Set scene to opening BEFORE the API call
       dispatch({ type: 'SET_SCENE', payload: 'opening' });
@@ -216,9 +242,7 @@ function GamePageContent() {
   }, [gameState]);
 
   const startCharacterCreation = () => {
-    // Just show the CharacterCreation UI component
-    // No LLM call needed — character data is front-end driven
-    setShowCharacterCreation(true);
+    dispatch({ type: 'SET_SHOW_CHARACTER_CREATION', payload: true });
   };
 
   const handleLanguageChange = (lang: 'zh' | 'en') => {
@@ -422,14 +446,6 @@ function GamePageContent() {
 
   return (
     <div className="h-screen bg-slate-950 flex flex-col overflow-hidden">
-      {/* Character Creation Overlay */}
-      {showCharacterCreation && (
-        <CharacterCreation
-          language={lang}
-          onComplete={handleCharacterCreated}
-        />
-      )}
-
       {/* Header */}
       <header className="bg-slate-900/80 border-b border-amber-700/30 px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
@@ -512,23 +528,64 @@ function GamePageContent() {
               )}
 
               {displayMessages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`mb-4 ${
-                    msg.role === 'user' ? 'flex justify-end' : ''
-                  }`}
-                >
+                <div key={index}>
                   <div
-                    className={`${
-                      msg.role === 'user'
-                        ? 'bg-amber-900/30 border border-amber-700/30 rounded-xl px-4 py-3 max-w-[80%]'
-                        : 'text-amber-100/90 leading-relaxed'
+                    className={`mb-1 ${
+                      msg.role === 'user' ? 'flex justify-end' : ''
                     }`}
                   >
-                    <div className="whitespace-pre-wrap text-sm md:text-base">
-                      {msg.content}
+                    <div
+                      className={`
+                        msg.role === 'user'
+                          ? 'bg-amber-900/30 border border-amber-700/30 rounded-xl px-4 py-3 max-w-[80%]'
+                          : 'text-amber-100/90 leading-relaxed'
+                      }`}
+                    >
+                      <div className="whitespace-pre-wrap text-sm md:text-base">
+                        {msg.content}
+                      </div>
                     </div>
                   </div>
+
+                  {/* Inline cards after assistant messages */}
+                  {msg.role === 'assistant' && (
+                    <>
+                      {/* Character creation card */}
+                      {index === 0 && gameState.showCharacterCreation && (
+                        <InlineCharacterCreation
+                          language={lang}
+                          onComplete={handleCharacterCreated}
+                        />
+                      )}
+
+                      {/* Inline notifications */}
+                      {gameState.inlineEvents
+                        .filter(e => e.afterMessageIndex === index)
+                        .map(event => (
+                          <InlineNotification
+                            key={event.id}
+                            type={event.type}
+                            value={event.value}
+                            language={lang}
+                          />
+                        ))
+                      }
+
+                      {/* Inline dice check */}
+                      {gameState.diceState !== 'idle' && gameState.currentCheck &&
+                        index === displayMessages.length - 1 && (
+                        <InlineDiceCheck
+                          onRoll={handleDiceRoll}
+                          disabled={gameState.isStreaming}
+                          difficulty={gameState.currentCheck.dc}
+                          checkLabel={gameState.currentCheck.label}
+                          statValue={gameState.character.stats[gameState.currentCheck.attribute as keyof typeof gameState.character.stats] || 10}
+                          diceState={gameState.diceState}
+                          language={lang}
+                        />
+                      )}
+                    </>
+                  )}
                 </div>
               ))}
 
@@ -561,23 +618,6 @@ function GamePageContent() {
           {/* Input area */}
           <div className="shrink-0 border-t border-amber-700/20 bg-slate-900/50 px-4 py-3">
             <div className="max-w-3xl mx-auto">
-              {/* Dice check notification */}
-              {gameState.diceState === 'awaiting_roll' && gameState.currentCheck && (
-                <div className="flex items-center justify-center gap-3 py-2 mb-2 rounded-lg bg-amber-900/20 border border-amber-700/30 animate-pulse">
-                  <span className="text-amber-300 text-sm">
-                    🎲 {lang === 'zh' ? '需要投骰！' : 'Dice check needed!'} {gameState.currentCheck.label} DC {gameState.currentCheck.dc}
-                  </span>
-                  <button
-                    onClick={() => {
-                      const diceSection = document.getElementById('dice-roller');
-                      diceSection?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="text-amber-400 text-sm underline"
-                  >
-                    {lang === 'zh' ? '去投骰 →' : 'Roll →'}
-                  </button>
-                </div>
-              )}
 
               <ChatInput
                 onSubmit={handleSendMessage}
@@ -614,21 +654,7 @@ function GamePageContent() {
               npcRelations={gameState.npcRelations}
               mechanics={gameState.mechanics}
             />
-            {/* Dice roller — state machine driven */}
-            <div id="dice-roller">
-              <DiceRoller
-                onRoll={handleDiceRoll}
-                disabled={gameState.isStreaming}
-                locked={gameState.diceState === 'idle'}
-                difficulty={gameState.currentCheck?.dc}
-                checkLabel={gameState.currentCheck?.label || ''}
-                diceState={gameState.diceState}
-                statValue={gameState.currentCheck
-                  ? gameState.character.stats[gameState.currentCheck.attribute as keyof typeof gameState.character.stats] || 10
-                  : 10}
-                language={lang}
-              />
-            </div>
+
           </div>
         </aside>
       </main>

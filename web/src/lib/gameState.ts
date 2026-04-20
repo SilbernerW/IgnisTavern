@@ -65,6 +65,16 @@ export interface GameState {
     dc: number;
     label: string;      // e.g. '体魄' or 'STR'
   };
+  // Inline events: cards embedded in the chat flow
+  inlineEvents: InlineEvent[];
+  showCharacterCreation: boolean;  // whether character creation card should show
+}
+
+export interface InlineEvent {
+  id: string;
+  type: 'item_add' | 'item_remove' | 'hp_change' | 'skill_add' | 'xp';
+  value: string | number;
+  afterMessageIndex: number;  // show after this message index
 }
 
 const defaultCharacter: Character = {
@@ -110,6 +120,8 @@ export const createInitialGameState = (): GameState => ({
   mechanics: { ...defaultGameMechanics },
   diceState: 'idle',
   currentCheck: undefined,
+  inlineEvents: [],
+  showCharacterCreation: true,
 });
 
 export const gameStateReducer = (
@@ -148,6 +160,9 @@ export const gameStateReducer = (
     | { type: 'SET_INSPECTION_PASSED'; payload: boolean }
     | { type: 'HEAL_CHARACTER'; payload: number }
     | { type: 'DAMAGE_CHARACTER'; payload: number }
+    | { type: 'ADD_INLINE_EVENT'; payload: InlineEvent }
+    | { type: 'CLEAR_INLINE_EVENTS' }
+    | { type: 'SET_SHOW_CHARACTER_CREATION'; payload: boolean }
     | { type: 'RESET_STATE' }
 ): GameState => {
   switch (action.type) {
@@ -295,6 +310,12 @@ export const gameStateReducer = (
       };
     case 'RESET_STATE':
       return createInitialGameState();
+    case 'ADD_INLINE_EVENT':
+      return { ...state, inlineEvents: [...state.inlineEvents, action.payload] };
+    case 'CLEAR_INLINE_EVENTS':
+      return { ...state, inlineEvents: [] };
+    case 'SET_SHOW_CHARACTER_CREATION':
+      return { ...state, showCharacterCreation: action.payload };
     default:
       return state;
   }
