@@ -1,31 +1,18 @@
-# ========== OS ==========
+# OS
 .DS_Store
 Thumbs.db
-ehthumbs.db
 
-# ========== Editor ==========
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-*.log
 
-# ========== Node / npm ==========
+# Node
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# ========== Python ==========
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-dist/
-build/
-.venv/
-venv/
+# Temporary commit message files
+commit_msg*.txt
 
 # ========== Unity / Game Dev ==========
 [Ll]ibrary/
