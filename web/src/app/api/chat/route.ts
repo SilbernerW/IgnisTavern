@@ -34,8 +34,7 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
  * Server-side chat API with auto provider fallback + daily rate limit.
  *
  * Priority (no user key):
- *   1. OpenRouter (MiniMax M2.5 free) — primary
- *   2. SiliconFlow (DeepSeek V3.2) — fallback
+                  provider: attempt.provider as ProviderId,
  *
  * Rate limit: 10 free requests per IP per day
  */
@@ -157,7 +156,6 @@ export async function POST(request: NextRequest) {
                 apiKey: attempt.apiKey,
                 messages: llmMessages,
                 model: attempt.model,
-                provider: attempt.provider as any,
                 provider: attempt.provider as ProviderId,
                 customApiUrl: attempt.customApiUrl,
               },
