@@ -105,7 +105,12 @@ function GamePageContent() {
       dispatch({ type: 'FINISH_STREAMING', payload: fullResponse });
     } catch (error: any) {
       let errMsg = error.message || 'Unknown error';
-      if (errMsg.includes('abort') || errMsg.includes('AbortError')) {
+      if (errMsg.includes('daily_limit')) {
+        errMsg = lang === 'zh'
+          ? '今日免费额度已用完（10次/天）。请点击右上角 🔑「API Key」配置自己的 Key 解除限制！'
+          : 'Daily free limit reached (10/day). Click 🔑 "API Key" in the top-right to configure your own key!';
+        setTimeout(() => setShowApiKeyModal(true), 500);
+      } else if (errMsg.includes('abort') || errMsg.includes('AbortError')) {
         errMsg = lang === 'zh'
           ? '请求超时（30秒无响应）。保底模型可能已不可用，请点击右上角「API Key」配置自己的 Key。'
           : 'Request timed out (30s). Fallback model may be unavailable — please click "API Key" to configure your own.';
@@ -193,7 +198,13 @@ function GamePageContent() {
         }
       } catch (error: any) {
         let errMsg = error.message || 'Unknown error';
-        if (errMsg.includes('abort') || errMsg.includes('AbortError')) {
+        if (errMsg.includes('daily_limit')) {
+          errMsg = gameState.language === 'zh'
+            ? '今日免费额度已用完（10次/天）。请点击右上角 🔑「API Key」配置自己的 Key 解除限制！'
+            : 'Daily free limit reached (10/day). Click 🔑 "API Key" in the top-right to configure your own key!';
+          // Auto-open API key modal on rate limit
+          setTimeout(() => setShowApiKeyModal(true), 500);
+        } else if (errMsg.includes('abort') || errMsg.includes('AbortError')) {
           errMsg = gameState.language === 'zh'
             ? '请求超时（30秒无响应）。保底模型可能已不可用，请点击右上角「API Key」配置自己的 Key。'
             : 'Request timed out (30s). Fallback model may be unavailable — please click "API Key" to configure your own.';
@@ -274,7 +285,7 @@ function GamePageContent() {
       act: '第 $ 幕',
       panel: '面板',
       apiKey: 'API Key',
-      welcome: '🔥 欢迎来到伊格尼斯酒馆 🔥\n\n输入任意内容开始你的冒险...',
+      welcome: '🔥 欢迎来到伊格尼斯酒馆 🔥\n\n💡 提示：当前使用免费保底模型（每日10次），建议点击右上角 🔑 配置自己的 API Key 获得更好的 DM 体验！\n\n输入任意内容开始你的冒险...',
     },
     en: {
       back: 'Back',
@@ -282,7 +293,7 @@ function GamePageContent() {
       act: 'Act $',
       panel: 'Panel',
       apiKey: 'API Key',
-      welcome: '🔥 Welcome to Ignis Tavern 🔥\n\nType anything to begin your adventure...',
+      welcome: '🔥 Welcome to Ignis Tavern 🔥\n\n💡 Tip: Using free fallback model (10/day). Click 🔑 in the top-right to configure your own API key for a better DM experience!\n\nType anything to begin your adventure...',
     },
   };
 
@@ -331,10 +342,12 @@ function GamePageContent() {
             </span>
           )}
           {gameState.apiMode === 'default' && (
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-800/80 border border-amber-700/20 text-xs text-amber-500/40">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500/50" />
-              {lang === 'zh' ? '保底模型' : 'Fallback'}
-            </span>
+            <button
+              onClick={() => setShowApiKeyModal(true)}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-900/40 border border-amber-600/50 text-xs text-amber-400 hover:bg-amber-900/60 transition-colors cursor-pointer"
+            >
+              🔑 {lang === 'zh' ? '配置 API Key 解锁更好体验' : 'Set API Key for better experience'}
+            </button>
           )}
         </div>
 

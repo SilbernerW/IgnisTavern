@@ -20,18 +20,18 @@ interface ApiKeyModalProps {
 
 const FALLBACK_INFO = {
   zh: {
-    provider: '硅基流动 + OpenRouter 双线',
-    model: 'DeepSeek V3.2 → MiniMax M2.5',
-    desc: '自动切换：主用硅基流动，失败时切 OpenRouter',
+    provider: 'OpenRouter + 硅基流动 双线',
+    model: 'MiniMax M2.5 → DeepSeek V3.2',
+    desc: '每日10次免费，建议配置自己的 Key',
     speed: '~2-5 秒/回复',
-    quality: '⭐⭐⭐⭐',
+    quality: '⭐⭐⭐',
   },
   en: {
-    provider: 'SiliconFlow + OpenRouter Dual',
-    model: 'DeepSeek V3.2 → MiniMax M2.5',
-    desc: 'Auto-switch: primary SiliconFlow, fallback OpenRouter',
+    provider: 'OpenRouter + SiliconFlow Dual',
+    model: 'MiniMax M2.5 → DeepSeek V3.2',
+    desc: '10 free calls/day, recommend your own key',
     speed: '~2-5 sec/response',
-    quality: '⭐⭐⭐⭐',
+    quality: '⭐⭐⭐',
   },
 };
 
@@ -113,7 +113,7 @@ export default function ApiKeyModal({
       modeDefaultDesc: '使用免费保底模型，无需配置',
       modeCustom: '自定义模式',
       modeCustomDesc: '使用自己的 API Key，体验更佳',
-      defaultBanner: '⚠️ 默认模式使用双线保底（硅基流动 DeepSeek V3.2 + OpenRouter MiniMax M2.5），可能会出现角色设定偏差。建议切换自定义模式，使用更强的模型（如 GPT-5.4、Claude Opus 4.7 等）获得最佳体验！',
+      defaultBanner: '⚠️ 默认模式每日限10次免费调用，使用的是小型免费模型，可能出现角色设定偏差。强烈建议配置自己的 API Key 解除限制并获得更好的 DM 体验！',
       fallbackInfo: '保底模型信息',
       fallbackProvider: '提供商',
       fallbackModel: '模型',
@@ -140,7 +140,7 @@ export default function ApiKeyModal({
       modeDefaultDesc: 'Use free fallback model, no setup needed',
       modeCustom: 'Custom',
       modeCustomDesc: 'Use your own API key for better experience',
-      defaultBanner: '⚠️ Default mode uses dual fallback (SiliconFlow DeepSeek V3.2 + OpenRouter MiniMax M2.5), may produce inaccurate settings. Switch to Custom mode with stronger models (e.g. GPT-5.4, Claude Opus 4.7) for best experience!',
+      defaultBanner: '⚠️ Default mode is limited to 10 free calls/day using small free models, which may produce inaccurate character settings. Strongly recommend configuring your own API key to remove the limit and get better DM quality!',
       fallbackInfo: 'Fallback Model Info',
       fallbackProvider: 'Provider',
       fallbackModel: 'Model',
@@ -384,7 +384,7 @@ export default function ApiKeyModal({
               onSave?.({
                 apiKey: mode === 'custom' ? apiKey.trim() : '',
                 provider: mode === 'custom' ? providerId : 'openrouter',
-                model: mode === 'custom' ? (model.trim() || provider.defaultModel) : 'deepseek-ai/DeepSeek-V3.2',
+                model: mode === 'custom' ? (model.trim() || provider.defaultModel) : 'minimax/minimax-m2.5:free',
                 customApiUrl: mode === 'custom' ? customApiUrl.trim() : '',
                 mode,
               });

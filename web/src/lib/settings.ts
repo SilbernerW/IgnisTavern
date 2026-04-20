@@ -12,8 +12,8 @@ export interface AppSettings {
 export const defaultSettings: AppSettings = {
   language: 'zh',
   apiKey: '',
-  provider: 'siliconflow',
-  model: 'deepseek-ai/DeepSeek-V3.2',
+  provider: 'openrouter',
+  model: 'minimax/minimax-m2.5:free',
   customApiUrl: '',
   apiMode: 'default',
 };

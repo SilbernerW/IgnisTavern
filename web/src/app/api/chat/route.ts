@@ -2,13 +2,41 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildGMPrompt } from '@/lib/agents/gm';
 import { streamChatCompletion } from '@/lib/llm';
 
+// ── In-memory daily rate limit (per IP, resets at UTC midnight) ──
+const dailyLimit = 10;
+const usageMap = new Map<string, { count: number; date: string }>();
+
+function getClientIp(req: NextRequest): string {
+  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || req.headers.get('x-real-ip')
+    || 'unknown';
+}
+
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD UTC
+  const entry = usageMap.get(ip);
+
+  if (!entry || entry.date !== today) {
+    usageMap.set(ip, { count: 1, date: today });
+    return { allowed: true, remaining: dailyLimit - 1 };
+  }
+
+  if (entry.count >= dailyLimit) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  entry.count++;
+  return { allowed: true, remaining: dailyLimit - entry.count };
+}
+
 /**
- * Server-side chat API with automatic provider fallback.
+ * Server-side chat API with auto provider fallback + daily rate limit.
  *
- * Priority:
- *   1. User's own API key (if provided)
- *   2. SiliconFlow (DeepSeek V3.2) — primary fallback
- *   3. OpenRouter (MiniMax M2.5 free) — secondary fallback
+ * Priority (no user key):
+ *   1. OpenRouter (MiniMax M2.5 free) — primary
+ *   2. SiliconFlow (DeepSeek V3.2) — fallback
+ *
+ * Rate limit: 10 free requests per IP per day
  */
 export async function POST(request: NextRequest) {
   try {
@@ -19,18 +47,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing or invalid messages' }, { status: 400 });
     }
 
-    // Build system prompt (same for all providers)
+    // User's own key = no rate limit
+    if (!userApiKey) {
+      const ip = getClientIp(request);
+      const { allowed, remaining } = checkRateLimit(ip);
+      if (!allowed) {
+        return NextResponse.json({
+          error: 'daily_limit',
+          remaining: 0,
+          limit: dailyLimit,
+          message: language === 'zh'
+            ? `今日免费额度已用完（${dailyLimit}次/天）。请配置自己的 API Key 继续游戏！`
+            : `Daily free limit reached (${dailyLimit}/day). Please configure your own API key to continue!`,
+        }, { status: 429 });
+      }
+    }
+
+    // Build system prompt
     const systemPrompt = buildGMPrompt(language || 'zh', (phase || 'character_creation') as any);
     const llmMessages = [
       { role: 'system', content: systemPrompt },
       ...messages,
     ];
 
-    // Determine which provider(s) to try
+    // Determine provider attempts
     const attempts: { apiKey: string; provider: string; model: string; customApiUrl?: string }[] = [];
 
     if (userApiKey) {
-      // User's own key — try it directly
       attempts.push({
         apiKey: userApiKey,
         provider: provider || 'openrouter',
@@ -38,22 +81,21 @@ export async function POST(request: NextRequest) {
         customApiUrl,
       });
     } else {
-      // No user key — try primary then secondary fallback
-      const sfKey = process.env.FALLBACK_API_KEY_SILICONFLOW;
       const orKey = process.env.FALLBACK_API_KEY_OPENROUTER;
+      const sfKey = process.env.FALLBACK_API_KEY_SILICONFLOW;
 
-      if (sfKey) {
-        attempts.push({
-          apiKey: sfKey,
-          provider: process.env.FALLBACK_PROVIDER || 'siliconflow',
-          model: process.env.FALLBACK_MODEL || 'deepseek-ai/DeepSeek-V3.2',
-        });
-      }
       if (orKey) {
         attempts.push({
           apiKey: orKey,
-          provider: process.env.FALLBACK_PROVIDER_2 || 'openrouter',
-          model: process.env.FALLBACK_MODEL_2 || 'minimax/minimax-m2.5:free',
+          provider: process.env.FALLBACK_PROVIDER || 'openrouter',
+          model: process.env.FALLBACK_MODEL || 'minimax/minimax-m2.5:free',
+        });
+      }
+      if (sfKey) {
+        attempts.push({
+          apiKey: sfKey,
+          provider: process.env.FALLBACK_PROVIDER_2 || 'siliconflow',
+          model: process.env.FALLBACK_MODEL_2 || 'deepseek-ai/DeepSeek-V3.2',
         });
       }
     }
@@ -65,9 +107,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Try each provider in order, fallback on failure
+    // Try each provider, fallback on failure
     let lastError = '';
-    for (const attempt of attempts) {
+    for (let i = 0; i < attempts.length; i++) {
+      const attempt = attempts[i];
+      const isLast = i === attempts.length - 1;
+
       const encoder = new TextEncoder();
       let hasContent = false;
       let streamError = '';
@@ -106,8 +151,8 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // If this is the last attempt or it succeeded, return the stream
-      if (attempts.indexOf(attempt) === attempts.length - 1) {
+      // If last attempt, just return the stream directly
+      if (isLast) {
         return new Response(stream, {
           headers: {
             'Content-Type': 'text/event-stream',
@@ -117,11 +162,9 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // For non-last attempts, collect the stream and check for errors
-      // If error, try next provider; if success, return the collected content
+      // For non-last attempts, collect and check for errors
       const chunks: string[] = [];
       let streamFailed = false;
-
       const reader = stream.getReader();
       const decoder = new TextDecoder();
 
@@ -130,27 +173,18 @@ export async function POST(request: NextRequest) {
           const { done, value } = await reader.read();
           if (done) break;
           const text = decoder.decode(value, { stream: true });
-          const lines = text.split('\n');
-          for (const line of lines) {
+          for (const line of text.split('\n')) {
             if (!line.startsWith('data: ')) continue;
-            const data = line.slice(6);
             try {
-              const parsed = JSON.parse(data);
-              if (parsed.error) {
-                streamFailed = true;
-                lastError = parsed.error;
-              } else if (parsed.content) {
-                chunks.push(parsed.content);
-              }
+              const parsed = JSON.parse(line.slice(6));
+              if (parsed.error) { streamFailed = true; lastError = parsed.error; }
+              else if (parsed.content) chunks.push(parsed.content);
             } catch {}
           }
         }
-      } catch {
-        streamFailed = true;
-      }
+      } catch { streamFailed = true; }
 
       if (!streamFailed && chunks.length > 0) {
-        // Success! Return the collected chunks as a new stream
         const resultStream = new ReadableStream({
           start(controller) {
             const enc = new TextEncoder();
@@ -162,28 +196,16 @@ export async function POST(request: NextRequest) {
           },
         });
         return new Response(resultStream, {
-          headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            Connection: 'keep-alive',
-          },
+          headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' },
         });
       }
 
-      // Failed — try next provider
       console.log(`Provider ${attempt.provider} failed: ${lastError}. Trying next...`);
     }
 
-    // All providers failed
-    return NextResponse.json(
-      { error: lastError || 'All providers failed' },
-      { status: 502 }
-    );
+    return NextResponse.json({ error: lastError || 'All providers failed' }, { status: 502 });
   } catch (error: any) {
     console.error('Chat API error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
