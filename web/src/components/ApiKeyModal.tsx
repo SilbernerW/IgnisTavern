@@ -70,11 +70,12 @@ export default function ApiKeyModal({
   }, [isOpen, currentKey, currentProvider, currentModel, currentCustomApiUrl, currentMode]);
 
   const refreshModels = useCallback(async () => {
-    if (!apiKey) { setLiveModels([]); return; }
+    // OpenRouter can fetch models without an API key (public endpoint)
+    if (!apiKey && providerId !== 'openrouter') { setLiveModels([]); return; }
     setLoadingModels(true);
     setModelFetchError('');
     try {
-      const models = await fetchModels(providerId, apiKey, customApiUrl);
+      const models = await fetchModels(providerId, apiKey || 'no-key', customApiUrl);
       setLiveModels(models);
     } catch {
       setLiveModels([]);
@@ -85,7 +86,7 @@ export default function ApiKeyModal({
   }, [providerId, apiKey, customApiUrl, language]);
 
   useEffect(() => {
-    if (isOpen && apiKey && mode === 'custom') {
+    if (isOpen && mode === 'custom') {
       const timer = setTimeout(refreshModels, 500);
       return () => clearTimeout(timer);
     }
@@ -328,7 +329,7 @@ export default function ApiKeyModal({
                            text-amber-100 placeholder-amber-700/50
                            focus:outline-none focus:border-amber-500 transition-colors"
                 />
-                {apiKey && (
+                {(apiKey || providerId === 'openrouter') && (
                   <div className="mt-1.5 text-xs text-amber-500/60">
                     {loadingModels
                       ? t.fetchingModels
@@ -338,11 +339,11 @@ export default function ApiKeyModal({
                   </div>
                 )}
                 {showModelSuggestions && filteredModels.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-slate-800 border border-amber-700/50 rounded-lg shadow-xl max-h-56 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-slate-800 border border-amber-700/50 rounded-lg shadow-xl max-h-64 overflow-y-auto">
                     <div className="px-3 py-1.5 text-xs text-amber-500/60 font-medium border-b border-amber-700/30 sticky top-0 bg-slate-800">
                       {t.suggestions} ({filteredModels.length})
                     </div>
-                    {filteredModels.slice(0, 50).map((m) => (
+                    {filteredModels.slice(0, 80).map((m) => (
                       <button
                         key={m.id}
                         onMouseDown={(e) => {
@@ -350,18 +351,20 @@ export default function ApiKeyModal({
                           setModel(m.id);
                           setShowModelSuggestions(false);
                         }}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors
+                        className={`w-full text-left px-4 py-2 text-sm transition-colors
                           ${model === m.id
                             ? 'text-amber-400 bg-amber-900/30'
                             : 'text-amber-100/80 hover:bg-amber-900/20 hover:text-amber-300'}
                         `}
                       >
-                        <span className="font-mono">{m.id}</span>
-                        {m.name && m.name !== m.id && (
-                          <span className="ml-2 text-amber-500/40 text-xs">({m.name})</span>
-                        )}
+                        <span className="font-mono text-xs">{m.free ? '🆓 ' : ''}{m.id}</span>
                       </button>
                     ))}
+                    {filteredModels.length > 80 && (
+                      <div className="px-3 py-2 text-xs text-amber-500/40 text-center">
+                        {filteredModels.length - 80} more — type to filter
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
