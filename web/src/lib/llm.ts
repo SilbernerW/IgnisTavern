@@ -26,7 +26,7 @@ export async function streamChatCompletion(
     provider: explicitProvider,
     customApiUrl,
     temperature = 0.8,
-    maxTokens = 2000,
+    maxTokens = 4096,
   } = options;
 
   // Detect or use explicit provider
@@ -99,9 +99,16 @@ export async function streamChatCompletion(
 
       try {
         const parsed = JSON.parse(data);
-        const content = parsed.choices?.[0]?.delta?.content;
-        if (content) {
-          onChunk(content);
+        const delta = parsed.choices?.[0]?.delta;
+        if (delta) {
+          // Skip reasoning_content — only send actual content to the UI
+          // Qwen3.x models put thinking in reasoning_content, answer in content
+          const content = delta.content;
+          if (content) {
+            onChunk(content);
+          }
+          // If only reasoning_content and no content yet, skip silently
+          // The user will see nothing until the model starts generating content
         }
       } catch {
         // Skip malformed JSON
@@ -120,7 +127,7 @@ async function streamAnthropic(
   onChunk: (text: string) => void,
   onDone: () => void
 ): Promise<void> {
-  const { apiKey, messages, model, temperature = 0.8, maxTokens = 2000 } = options;
+  const { apiKey, messages, model, temperature = 0.8, maxTokens = 4096 } = options;
   const provider = PROVIDERS.anthropic;
   const modelName = model || provider.defaultModel;
 
