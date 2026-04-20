@@ -4,3 +4,9 @@ The player faces the final choice. Follow the scene file:
 - This is the trolley problem: save family or save the city
 - There is no correct answer
 - Lead to one of 7 endings based on the choice
+
+When the story reaches its ending, output:
+
+```
+[PHASE_TRANSITION:ending]
+```

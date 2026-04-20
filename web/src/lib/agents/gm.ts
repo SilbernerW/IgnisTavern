@@ -8,14 +8,14 @@ type GamePhase = 'character_creation' | 'opening' | 'act1' | 'act2' | 'act3';
  *
  * Composition order (optimized for small models):
  *   1. system_{lang}.md         — DM persona + ABSOLUTE RULES (primacy effect)
- *   2. dm_behavior_{lang}.md    — behavioral constraints (no settings/rules/numbers)
+ *   2. dm_behavior_{lang}.md    — behavioral constraints
  *   3. web_dm_rules_{lang}.md   — web-specific rules
  *   4. phases/{phase}_{lang}.md — current phase instructions
- *   5. world_{lang}.md          — world setting (spoilers gated)
- *   6. characters/*_{lang}.md   — NPC details
- *   7. RULES_{lang}.md          — game rules (DC, HP, skills, etc.)
+ *   5. world_{lang}.md          — world setting (skip for character_creation)
+ *   6. characters/*_{lang}.md   — NPC details (skip for character_creation)
+ *   7. RULES_{lang}.md          — game rules (skip for character_creation)
  *   8. scenes/act*_{lang}.md    — current scene script
- *   9. ABSOLUTE RULES repeat    — restate top 5 rules at the end (recency effect)
+ *   9. Phase-specific closing reminder (recency effect)
  */
 export function buildGMPrompt(language: string, phase: GamePhase = 'character_creation'): string {
   const lang = language === 'zh' ? 'zh' : 'en';
@@ -42,21 +42,27 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
   // 4. Phase-specific instructions
   const phaseInstructions = readDataFile('prompts', 'phases', `${phase}_${lang}.md`);
 
-  // 5. World setting (spoilers gated in "DM Internal Reference" section)
-  const worldSetting = readDataFile('prompts', `world_${lang}.md`);
+  // 5. World setting — skip for character_creation to prevent premature narration
+  const worldSetting = phase !== 'character_creation'
+    ? readDataFile('prompts', `world_${lang}.md`)
+    : '';
 
-  // 6. ALL character files
-  const charactersDir = path.join(dataDir, 'prompts', 'characters');
+  // 6. ALL character files — skip for character_creation
   let characterTexts = '';
-  try {
-    const charFiles = fs.readdirSync(charactersDir).filter(f => f.endsWith(`_${lang}.md`));
-    for (const file of charFiles) {
-      characterTexts += '\n\n---\n\n' + fs.readFileSync(path.join(charactersDir, file), 'utf-8');
-    }
-  } catch {}
+  if (phase !== 'character_creation') {
+    const charactersDir = path.join(dataDir, 'prompts', 'characters');
+    try {
+      const charFiles = fs.readdirSync(charactersDir).filter(f => f.endsWith(`_${lang}.md`));
+      for (const file of charFiles) {
+        characterTexts += '\n\n---\n\n' + fs.readFileSync(path.join(charactersDir, file), 'utf-8');
+      }
+    } catch {}
+  }
 
-  // 7. Full game rules
-  const rules = readDataFile('rules', `RULES_${lang}.md`);
+  // 7. Full game rules — skip for character_creation
+  const rules = phase !== 'character_creation'
+    ? readDataFile('rules', `RULES_${lang}.md`)
+    : '';
 
   // 8. Current scene script
   let sceneText = '';
@@ -75,10 +81,25 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
     sceneLabel = lang === 'zh' ? sceneInfo.labelZh : sceneInfo.labelEn;
   }
 
-  // 9. Repeated absolute rules at the end (recency effect for small models)
-  const closingReminder = lang === 'zh'
-    ? `\n\n---\n\n## ⚠️ 再次提醒（必须遵守）\n\n1. Licht 是海豹，不是人。用"它"，描述鳍足和圆滚滚的身体\n2. 不剧透——当前阶段未揭示的内容绝口不提\n3. 不自己投骰——宣布检定后停下来等玩家\n4. 场景文件是真相源——逐字使用，不得改写\n5. 你是DM，不是AI`
-    : `\n\n---\n\n## ⚠️ REMINDER (Must Follow)\n\n1. Licht is a SEAL, not a human. Use "it", describe flippers and round body\n2. No spoilers — never mention content not yet revealed in the current act\n3. Never roll dice yourself — announce check then STOP and wait\n4. Scene files are source of truth — use verbatim, do not paraphrase\n5. You are the DM, not an AI`;
+  // 9. Phase-specific closing reminder (recency effect for small models)
+  const phaseClosingMap: Record<string, Record<string, string>> = {
+    zh: {
+      character_creation: '⚠️ 最后提醒：你现在是角色创建阶段！只帮玩家建角色，不要讲故事！展示完整角色卡后输出 [PHASE_TRANSITION:opening]',
+      opening: '⚠️ 最后提醒：你现在开始开场叙事！场景文件必须逐字使用，给2-3个选项后输出 [PHASE_TRANSITION:act1]',
+      act1: '⚠️ 最后提醒：你在第一幕酒馆经营阶段！追踪营收和NPC，准备进入第二幕时输出 [PHASE_TRANSITION:act2]',
+      act2: '⚠️ 最后提醒：你在第二幕！逐步揭露真相，准备进入第三幕时输出 [PHASE_TRANSITION:act3]',
+      act3: '⚠️ 最后提醒：你在第三幕！玩家面临最终抉择，故事结束时输出 [PHASE_TRANSITION:ending]',
+    },
+    en: {
+      character_creation: '⚠️ REMINDER: You are in CHARACTER CREATION! Only build the character, DO NOT narrate! After showing complete character sheet, output [PHASE_TRANSITION:opening]',
+      opening: '⚠️ REMINDER: Begin the opening narrative! Use scene file verbatim, give 2-3 options, then output [PHASE_TRANSITION:act1]',
+      act1: '⚠️ REMINDER: You are in Act I tavern management! Track revenue and NPCs, when ready for Act II output [PHASE_TRANSITION:act2]',
+      act2: '⚠️ REMINDER: You are in Act II! Reveal truth gradually, when ready for Act III output [PHASE_TRANSITION:act3]',
+      act3: '⚠️ REMINDER: You are in Act III! Player faces final choice, when story ends output [PHASE_TRANSITION:ending]',
+    },
+  };
+
+  const phaseSpecificClosing = phaseClosingMap[lang]?.[phase] || '';
 
   // Compose
   const parts: string[] = [];
@@ -91,7 +112,7 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
   if (characterTexts) parts.push('\n\n## 角色设定\n\n' + characterTexts);
   if (rules) parts.push('\n\n## 游戏规则\n\n' + rules);
   if (sceneText) parts.push(`\n\n## 当前场景：${sceneLabel}\n\n【重要：以下内容必须逐字使用，不得改写】\n\n${sceneText}`);
-  parts.push(closingReminder);
+  if (phaseSpecificClosing) parts.push('\n\n---\n\n' + phaseSpecificClosing);
 
   return parts.join('');
 }

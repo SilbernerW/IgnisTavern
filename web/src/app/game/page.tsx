@@ -103,6 +103,19 @@ function GamePageContent() {
         dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
       }
       dispatch({ type: 'FINISH_STREAMING', payload: fullResponse });
+
+      // Check for phase transition in character creation response
+      const charPhaseMatch = fullResponse.match(/\[PHASE_TRANSITION:(\w+)\]/);
+      if (charPhaseMatch) {
+        const charClean = fullResponse.replace(/\[PHASE_TRANSITION:\w+\]/g, '').trim();
+        dispatch({ type: 'FINISH_STREAMING', payload: charClean });
+        if (charPhaseMatch[1] === 'opening') {
+          setTimeout(() => {
+            dispatch({ type: 'SET_SCENE', payload: 'opening' });
+            dispatch({ type: 'SET_ACT', payload: 1 });
+          }, 1500);
+        }
+      }
     } catch (error: any) {
       let errMsg = error.message || 'Unknown error';
       if (errMsg.includes('daily_limit')) {
@@ -195,6 +208,34 @@ function GamePageContent() {
           setAwaitingDice(true);
           setDiceDifficulty(detectedDC);
           setDiceCheckLabel(detectedLabel);
+        }
+
+        // Check for phase transition marker
+        const phaseMatch = fullResponse.match(/\[PHASE_TRANSITION:(\w+)\]/);
+        if (phaseMatch) {
+          const nextPhase = phaseMatch[1];
+          // Strip the marker from displayed text
+          const cleanResponse = fullResponse.replace(/\[PHASE_TRANSITION:\w+\]/g, '').trim();
+          dispatch({ type: 'FINISH_STREAMING', payload: cleanResponse });
+
+          // Map phase names to game phases
+          const phaseMap: Record<string, string> = {
+            'opening': 'opening',
+            'act1': 'act1',
+            'act2': 'act2',
+            'act3': 'act3',
+            'ending': 'ending',
+          };
+          if (phaseMap[nextPhase]) {
+            // Delay phase transition slightly so player can see the current response
+            setTimeout(() => {
+              dispatch({ type: 'SET_SCENE', payload: phaseMap[nextPhase] });
+              if (nextPhase === 'opening') dispatch({ type: 'SET_ACT', payload: 1 });
+              else if (nextPhase === 'act1') dispatch({ type: 'SET_ACT', payload: 1 });
+              else if (nextPhase === 'act2') dispatch({ type: 'SET_ACT', payload: 2 });
+              else if (nextPhase === 'act3') dispatch({ type: 'SET_ACT', payload: 3 });
+            }, 1500);
+          }
         }
       } catch (error: any) {
         let errMsg = error.message || 'Unknown error';
