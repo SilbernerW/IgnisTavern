@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildGMPrompt } from '@/lib/agents/gm';
 import { streamChatCompletion } from '@/lib/llm';
+import { ProviderId } from '@/lib/providers';
 
 // ── In-memory daily rate limit (per IP, resets at UTC midnight) ──
 const dailyLimit = 10;
@@ -40,7 +41,15 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await request.json() as {
+      messages?: Array<{ role: string; content: string }>;
+      language?: 'zh' | 'en';
+      phase?: string;
+      provider?: string;
+      model?: string;
+      userApiKey?: string;
+      customApiUrl?: string;
+    };
     const { messages, language, phase, provider, model, userApiKey, customApiUrl } = body;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -50,7 +59,7 @@ export async function POST(request: NextRequest) {
     // User's own key = no rate limit
     if (!userApiKey) {
       const ip = getClientIp(request);
-      const { allowed, remaining } = checkRateLimit(ip);
+      const { allowed } = checkRateLimit(ip);
       if (!allowed) {
         return NextResponse.json({
           error: 'daily_limit',
@@ -64,13 +73,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Build system prompt (progressive loading — only includes files relevant to current phase)
-    const currentPhase = (phase || 'character_creation') as any;
+    const currentPhase = (phase || 'character_creation') as 'character_creation' | 'opening' | 'act1' | 'act2' | 'act3' | 'ending';
     const systemPrompt = buildGMPrompt(language || 'zh', currentPhase);
 
     // For the opening phase, inject a scene-trigger user message if this is the first turn
     // after character creation. This gives the model a clear signal to narrate the opening scene.
     const lang = language === 'zh' ? 'zh' : 'en';
-    let llmMessages: { role: string; content: string }[] = [
+    const llmMessages: { role: string; content: string }[] = [
       { role: 'system', content: systemPrompt },
     ];
 
@@ -138,7 +147,6 @@ export async function POST(request: NextRequest) {
       const isLast = i === attempts.length - 1;
 
       const encoder = new TextEncoder();
-      let hasContent = false;
       let streamError = '';
 
       const stream = new ReadableStream({
@@ -150,10 +158,10 @@ export async function POST(request: NextRequest) {
                 messages: llmMessages,
                 model: attempt.model,
                 provider: attempt.provider as any,
+                provider: attempt.provider as ProviderId,
                 customApiUrl: attempt.customApiUrl,
               },
               (chunk) => {
-                hasContent = true;
                 controller.enqueue(
                   encoder.encode(`data: ${JSON.stringify({ content: chunk })}\n\n`)
                 );
@@ -165,8 +173,8 @@ export async function POST(request: NextRequest) {
                 controller.close();
               }
             );
-          } catch (error: any) {
-            streamError = error.message || 'Stream error';
+          } catch (error: unknown) {
+            streamError = error instanceof Error ? error.message : 'Stream error';
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ error: streamError })}\n\n`)
             );
@@ -228,8 +236,9 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: lastError || 'All providers failed' }, { status: 502 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Chat API error:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

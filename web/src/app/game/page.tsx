@@ -17,7 +17,7 @@ import {
 } from '@/lib/gameState';
 import { parseDiceCheck, calculateRollResult, formatRollMessage } from '@/lib/diceMachine';
 import { streamChatMessage } from '@/lib/api';
-import { loadGame, saveGame, deleteSave } from '@/lib/storage';
+import { loadGame, saveGame } from '@/lib/storage';
 import { loadSettings, saveSettings as persistSettings } from '@/lib/settings';
 import { PROVIDERS, ProviderId } from '@/lib/providers';
 
@@ -27,7 +27,6 @@ function GamePageContent() {
   const [gameState, dispatch] = useReducer(gameStateReducer, createInitialGameState());
   const [showSidePanel, setShowSidePanel] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  const abortRef = useRef<AbortController | null>(null);
 
   // Ref to always have latest API settings (avoids stale closure issues)
   const apiSettingsRef = useRef({
@@ -498,11 +497,6 @@ function GamePageContent() {
     router.push('/');
   };
 
-  const handleNewGame = () => {
-    deleteSave();
-    window.location.reload();
-  };
-
   const t = {
     zh: {
       back: '返回',
@@ -535,13 +529,7 @@ function GamePageContent() {
     })),
   ];
 
-  // The streaming buffer — all text received for the current response
-  const streamingBuffer = gameState.isStreaming
-    ? (gameState.messages.length > 0
-        ? gameState.messages[gameState.messages.length - 1].content // not used for streaming
-        : '') + gameState.displayedText
-    : '';
-  // Actually: for streaming, we track displayedText as the buffer
+  // Current streaming response buffer
   const currentStreamBuffer = gameState.displayedText;
 
   return (
