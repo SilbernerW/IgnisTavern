@@ -3,7 +3,7 @@
  * Last updated: 2026-04-20
  */
 
-export type ProviderId = 'openrouter' | 'siliconflow' | 'custom';
+export type ProviderId = 'openrouter' | 'siliconflow' | 'deepseek' | 'openai' | 'anthropic' | 'google' | 'minimax' | 'custom';
 
 export interface ProviderConfig {
   id: ProviderId;
@@ -83,9 +83,68 @@ export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
     apiKeyPrefix: '',
     apiKeyHint: 'Any API Key',
   },
+
+  deepseek: {
+    id: 'deepseek',
+    name: 'DeepSeek',
+    nameZh: 'DeepSeek',
+    apiUrl: 'https://api.deepseek.com/v1/chat/completions',
+    defaultModel: 'deepseek-chat',
+    models: ['deepseek-chat', 'deepseek-reasoner'],
+    apiKeyPrefix: 'sk-',
+    apiKeyHint: 'sk-... (deepseek.com)',
+  },
+
+  openai: {
+    id: 'openai',
+    name: 'OpenAI',
+    nameZh: 'OpenAI',
+    apiUrl: 'https://api.openai.com/v1/chat/completions',
+    defaultModel: 'gpt-5.4-mini',
+    models: ['gpt-5.4', 'gpt-5.4-mini', 'gpt-5.4-nano'],
+    apiKeyPrefix: 'sk-',
+    apiKeyHint: 'sk-... (platform.openai.com)',
+  },
+
+  anthropic: {
+    id: 'anthropic',
+    name: 'Anthropic',
+    nameZh: 'Anthropic',
+    apiUrl: 'https://api.anthropic.com/v1/messages',
+    defaultModel: 'claude-opus-4.7',
+    models: ['claude-opus-4.7', 'claude-sonnet-4-20250514'],
+    apiKeyPrefix: 'sk-ant-',
+    apiKeyHint: 'sk-ant-...',
+  },
+
+  google: {
+    id: 'google',
+    name: 'Google Gemini',
+    nameZh: 'Google Gemini',
+    apiUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+    defaultModel: 'gemini-3-pro',
+    models: ['gemini-3-pro', 'gemini-2.5-flash-preview-05-20', 'gemini-2.0-flash'],
+    apiKeyPrefix: 'AI',
+    apiKeyHint: 'AIza... (aistudio.google.com)',
+  },
+
+  minimax: {
+    id: 'minimax',
+    name: 'MiniMax',
+    nameZh: 'MiniMax',
+    apiUrl: 'https://api.minimax.chat/v1/text/chatcompletion_v2',
+    defaultModel: 'MiniMax-M2.7',
+    models: ['MiniMax-M2.7', 'MiniMax-M1', 'MiniMax-Text-01'],
+    apiKeyPrefix: '',
+    apiKeyHint: 'MM API Key',
+  },
 };
 
 export function detectProvider(apiKey: string): ProviderId {
   if (apiKey.startsWith('sk-or-')) return 'openrouter';
-  return 'siliconflow';
+  if (apiKey.startsWith('sk-ant-')) return 'anthropic';
+  if (apiKey.startsWith('AIza')) return 'google';
+  if (apiKey.startsWith('sk-') && apiKey.length < 40) return 'deepseek';
+  if (apiKey.startsWith('sk-')) return 'openai';
+  return 'openrouter';
 }

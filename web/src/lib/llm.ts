@@ -31,6 +31,11 @@ export async function streamChatCompletion(
   const providerId = explicitProvider || detectProvider(apiKey);
   const provider = PROVIDERS[providerId];
 
+  // Anthropic has a different API format
+  if (providerId === 'anthropic') {
+    return streamAnthropic(options, onChunk, onDone);
+  }
+
   const apiUrl = providerId === 'custom' && customApiUrl
     ? customApiUrl
     : provider.apiUrl;
@@ -122,6 +127,88 @@ export async function streamChatCompletion(
       } catch {
         // Skip malformed JSON
       }
+    }
+  }
+
+  onDone();
+}
+
+/**
+ * Anthropic streaming (different API format)
+ */
+async function streamAnthropic(
+  options: ChatCompletionOptions,
+  onChunk: (text: string) => void,
+  onDone: () => void
+): Promise<void> {
+  const { apiKey, messages, model, temperature = 0.4, maxTokens = 4096 } = options;
+  const provider = PROVIDERS.anthropic;
+  const modelName = model || provider.defaultModel;
+
+  const systemMessage = messages.find(m => m.role === 'system')?.content || '';
+  const chatMessages = messages
+    .filter(m => m.role !== 'system')
+    .map(m => ({ role: m.role, content: m.content }));
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+
+  const response = await fetch(provider.apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: modelName,
+      system: systemMessage,
+      messages: chatMessages,
+      temperature,
+      max_tokens: maxTokens,
+      stream: true,
+    }),
+    signal: controller.signal,
+  });
+
+  clearTimeout(timeout);
+
+  if (!response.ok) {
+    let errorMsg = `Anthropic API error: ${response.status}`;
+    try {
+      const error = await response.json();
+      errorMsg = error.error?.message || errorMsg;
+    } catch {}
+    throw new Error(errorMsg);
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error('No response body');
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith('data: ')) continue;
+      try {
+        const parsed = JSON.parse(trimmed.slice(6));
+        if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+          onChunk(parsed.delta.text);
+        } else if (parsed.type === 'message_stop') {
+          onDone();
+          return;
+        }
+      } catch {}
     }
   }
 
