@@ -243,6 +243,55 @@ function GamePageContent() {
 
   const startCharacterCreation = () => {
     dispatch({ type: 'SET_SHOW_CHARACTER_CREATION', payload: true });
+
+    // Call the DM with character_creation phase to get a welcome message
+    // The DM will output a short intro, then the inline card appears below
+    dispatch({ type: 'SET_SCENE', payload: 'character_creation' });
+
+    const triggerMessage = gameState.language === 'zh'
+      ? '开始游戏'
+      : 'Start the game';
+
+    dispatch({ type: 'ADD_USER_MESSAGE', payload: triggerMessage });
+    dispatch({ type: 'SET_STREAMING', payload: true });
+    dispatch({ type: 'APPEND_STREAMING_TEXT', payload: '' });
+
+    (async () => {
+      let fullResponse = '';
+      try {
+        for await (const chunk of streamChatMessage(
+          [{ role: 'user', content: triggerMessage }],
+          gameState.language,
+          gameState.userApiKey,
+          'character_creation',
+          gameState.provider,
+          gameState.model,
+          gameState.customApiUrl
+        )) {
+          fullResponse += chunk;
+          dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
+        }
+        const cleaned = stripAndParseTags(fullResponse, dispatch);
+        dispatch({ type: 'FINISH_STREAMING', payload: cleaned });
+      } catch (error: any) {
+        let errMsg = error.message || 'Unknown error';
+        if (errMsg.includes('daily_limit')) {
+          errMsg = gameState.language === 'zh'
+            ? '今日免费额度已用完（10次/天）。请点击右上角 🔑「API Key」配置自己的 Key 解除限制！'
+            : 'Daily free limit reached (10/day). Click 🔑 "API Key" to configure your own key!';
+          setTimeout(() => setShowApiKeyModal(true), 500);
+        } else if (errMsg.includes('abort') || errMsg.includes('AbortError')) {
+          errMsg = gameState.language === 'zh'
+            ? '请求超时。保底模型可能已不可用，请点击右上角「API Key」配置自己的 Key。'
+            : 'Request timed out. Fallback model may be unavailable — please configure your own API key.';
+        } else {
+          errMsg = gameState.language === 'zh'
+            ? `连接失败：${errMsg}`
+            : `Connection failed: ${errMsg}`;
+        }
+        dispatch({ type: 'FINISH_STREAMING', payload: fullResponse || errMsg });
+      }
+    })();
   };
 
   const handleLanguageChange = (lang: 'zh' | 'en') => {

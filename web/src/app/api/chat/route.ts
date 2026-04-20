@@ -78,7 +78,13 @@ export async function POST(request: NextRequest) {
     // (character creation is now UI-driven, so the first message in opening
     // is always the trigger from the front-end)
     const userMessages = messages.filter(m => m.role === 'user');
-    if (currentPhase === 'opening' && userMessages.length <= 1) {
+    if (currentPhase === 'character_creation' && userMessages.length <= 1) {
+      // First turn in character creation — inject welcome trigger
+      const trigger = lang === 'zh'
+        ? '开始游戏。请输出欢迎词。'
+        : 'Start the game. Please output a welcome message.';
+      llmMessages.push({ role: 'user', content: trigger });
+    } else if (currentPhase === 'opening' && userMessages.length <= 1) {
       // First turn in opening phase — inject scene trigger as the user message
       const trigger = lang === 'zh'
         ? '角色已创建完成。请按照场景文件原文，开始第一幕开场叙事。'
