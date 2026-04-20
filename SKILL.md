@@ -291,20 +291,61 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 **Narrative Summary**:
 > The inspector arrives, confirms qualification. That night, Yu quietly thanks the player for not running — revealing her fear of abandonment. The team bond is solidified.
 
-**End of Session**: After the qualification scene, the session ends here. This is the current playable prototype endpoint.
+**End of Act I**: After the qualification scene, Act I concludes. The story continues to Act II — The Dark Truth.
 
-**Session End**:
-> "——伊格尼斯酒馆 · 第一幕的故事到此结束。感谢你的游玩。"
->
-> "— The story of Ignis Tavern — Act I ends here. Thank you for playing."
+**Session Continue**: Proceed to Step 5 — Act II.
 
-> *Act II and Act III are under development. To be continued.*
+---
+
+### Step 5: Act II — Investigation Phase
+
+**Trigger**: Act I completed, Festival qualification achieved.
+
+**File**: `src/scenes/act2_investigation_zh.md` (or `*_en.md`)
+
+**AI Action**: Load and present the investigation scene. The player receives a suspicious Gourmet Competition invitation, triggering Huan's memories and the team's decision to investigate.
+
+**Three Investigation Routes**:
+- **Archives** (Huan suggests) — INT check, discover 137-year cycle records
+- **Underground Black Market** (Licht guides) — CHA check, obtain Holy Flame fragment
+- **Holy Flame Plaza** (Huan insists) — PER check, see soul faces in the flame
+
+**Key Mechanics**:
+- Player chooses investigation approach (single route / split team / sequential)
+- Each route reveals different aspects of the truth
+- Team regroups to share findings before proceeding
+
+**Completion**: After all investigations conclude, proceed to Step 6.
+
+---
+
+### Step 6: Act II — Revelation Phase
+
+**File**: `src/scenes/act2_revelation_zh.md` (or `*_en.md`)
+
+**AI Action**: Load and present the revelation scene. Late night of competition day, the team infiltrates the underground chamber beneath Holy Flame Plaza.
+
+**Scene Structure**:
+1. **Discovery** — Bone piles and soul-burning array revealed
+2. **Confrontation** — Flame Keeper appears and challenges the team
+3. **Final Choice** — Player decides: flee / stop the ritual / seek a third way
+
+**Key Mechanics**:
+- Reveal truth gradually, not all at once
+- Huan's emotional state is critical — his flame resonance intensifies
+- Yu hints at the "anchor point" at critical moments
+- Player choices during confrontation affect available options in Act III
+
+**Phase Transition**: When Act II concludes naturally, output:
+```
+[PHASE_TRANSITION:act3]
+```
+
+> *Act III — The Choice is under development. To be continued.*
 
 ---
 
 ### Future Expansion
-
-**Act II — The Dark Truth**: Huan's investigation leads to the truth behind Ignis's Sacred Flame — a demonic bargain that demands a human tribute every ten years. The player's found family is now in danger.
 
 **Act III — The Choice**: The Trolley Problem — save the found family, or save the city. No correct answer. Both choices have permanent, devastating consequences. Act III is fully scripted with 7 distinct endings.
 
@@ -386,7 +427,8 @@ Accept any reasonable answer. Reference RULES_{lang}.md for mechanical outcomes.
 | Act I Opening | `act1_opening_zh.md` | `act1_opening_en.md` | ✅ both |
 | Act I Tavern Management | `act1_tavern_management_zh.md` | `act1_tavern_management_en.md` | ✅ both |
 | Act I Qualification | `act1_qualification_zh.md` | `act1_qualification_en.md` | ✅ both |
-| Act II Dark Truth | `act2_main_zh.md` | `act2_main_en.md` | ⚠️ Chinese only |
+| Act II Investigation | `act2_investigation_zh.md` | `act2_investigation_en.md` | ✅ both |
+| Act II Revelation | `act2_revelation_zh.md` | `act2_revelation_en.md` | ✅ both |
 | Act III Opening | `act3_opening_zh.md` | `act3_opening_en.md` | ✅ both |
 | Act III Confrontation | `act3_confrontation_zh.md` | `act3_confrontation_en.md` | ✅ both |
 | Act III Endings (7 endings) | `act3_endings_zh.md` | `act3_endings_en.md` | ✅ both |
@@ -464,8 +506,10 @@ ignis-tavern/
 │       ├── act1_tavern_management_en.md  # ✅ Daily loop (English)
 │       ├── act1_qualification_zh.md    # ✅ Qualification (Chinese)
 │       ├── act1_qualification_en.md    # ✅ Qualification (English)
-│       ├── act2_main_zh.md       # ✅ Act II (Chinese)
-│       ├── act2_main_en.md       # ✅ Act II (English)
+│       ├── act2_investigation_zh.md  # ✅ Act II Investigation (Chinese)
+│       ├── act2_investigation_en.md  # ✅ Act II Investigation (English)
+│       ├── act2_revelation_zh.md     # ✅ Act II Revelation (Chinese)
+│       ├── act2_revelation_en.md     # ✅ Act II Revelation (English)
 │       ├── act3_opening_zh.md     # ✅ Act III Opening (Chinese)
 │       ├── act3_opening_en.md     # ✅ Act III Opening (English)
 │       ├── act3_confrontation_zh.md  # ✅ Act III Confrontation (Chinese)
