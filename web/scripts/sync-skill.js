@@ -99,6 +99,7 @@ function sync() {
       // Check if source exists
       if (!fs.existsSync(mapping.src)) {
         console.log(`⚠️  Skipping ${mapping.name}: source not found at ${mapping.src}`);
+        console.log(`   (This is OK for Vercel builds — data should already be in git)`);
         continue;
       }
 

@@ -44,9 +44,10 @@ next-env.d.ts
 AGENTS.md
 CLAUDE.md
 
-# Synced from skill (auto-generated)
-src/data/prompts/
-src/data/rules/
-src/data/scenes/
-src/data/npc/
-public/assets/
+# Synced from skill — committed to git for Vercel builds
+# Run `npm run sync` locally after modifying src/ content, then commit
+# src/data/prompts/
+# src/data/rules/
+# src/data/scenes/
+# src/data/npc/
+# public/assets/
