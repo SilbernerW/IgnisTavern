@@ -267,6 +267,12 @@ export default function ApiKeyModal({
                     </option>
                   ))}
                 </select>
+                {/* Setup note */}
+                {provider.setupNoteZh && (
+                  <div className={`mt-1.5 text-xs px-3 py-2 rounded-lg ${provider.setupNoteZh.startsWith('✅') ? 'bg-green-900/20 text-green-400/70' : 'bg-amber-900/20 text-amber-400/70'}`}>
+                    {language === 'zh' ? provider.setupNoteZh : (provider.setupNoteEn || provider.setupNoteZh)}
+                  </div>
+                )}
               </div>
 
               {/* Custom URL */}
@@ -296,7 +302,13 @@ export default function ApiKeyModal({
                   type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder={provider.apiKeyHint}
+                  placeholder={
+                    providerId === 'cloudflare'
+                      ? language === 'zh'
+                        ? 'account_id:api_token（如 123abc:xyzToken）'
+                        : 'account_id:api_token (e.g. 123abc:xyzToken)'
+                      : provider.apiKeyHint
+                  }
                   className="w-full px-4 py-3 bg-slate-800 border border-amber-700/50 rounded-lg
                            text-amber-100 placeholder-amber-700/50
                            focus:outline-none focus:border-amber-500 transition-colors"

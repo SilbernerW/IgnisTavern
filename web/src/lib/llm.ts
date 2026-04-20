@@ -15,7 +15,7 @@ interface ChatCompletionOptions {
  * Anthropic uses a different format, handled separately.
  */
 export async function streamChatCompletion(
-  options: ChatCompletionOptions,
+  optionsInput: ChatCompletionOptions,
   onChunk: (text: string) => void,
   onDone: () => void
 ): Promise<void> {
@@ -27,7 +27,7 @@ export async function streamChatCompletion(
     customApiUrl,
     temperature = 0.4,
     maxTokens = 4096,
-  } = options;
+  } = optionsInput;
 
   // Detect or use explicit provider
   const providerId = explicitProvider || detectProvider(apiKey);
@@ -35,15 +35,39 @@ export async function streamChatCompletion(
 
   // Anthropic has a different API format
   if (providerId === 'anthropic') {
-    return streamAnthropic(options, onChunk, onDone);
+    return streamAnthropic(optionsInput, onChunk, onDone);
   }
 
   // MiniMax has a slightly different format but close enough to OpenAI
-  const apiUrl = providerId === 'custom' && customApiUrl
+  let apiUrl = providerId === 'custom' && customApiUrl
     ? customApiUrl
     : provider.apiUrl;
 
   const modelName = model || provider.defaultModel;
+
+  // Cloudflare needs account_id in URL — extract from apiKey format "account_id:api_token"
+  let authToken = apiKey;
+  if (providerId === 'cloudflare') {
+    const parts = apiKey.split(':');
+    if (parts.length === 2) {
+      apiUrl = apiUrl.replace('{account_id}', parts[0]);
+      authToken = parts[1];
+    }
+  }
+
+  // GitHub Models needs different auth header
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(providerId === 'github'
+      ? { Authorization: `Bearer ${apiKey}`, 'X-GitHub-Api-Version': '2022-11-28' }
+      : providerId === 'cloudflare'
+        ? { Authorization: `Bearer ${authToken}` }
+        : { Authorization: `Bearer ${apiKey}` }),
+    ...(providerId === 'openrouter' ? {
+      'HTTP-Referer': 'https://ignis-tavern.vercel.app',
+      'X-Title': 'Ignis Tavern',
+    } : {}),
+  };
 
   // Timeout controller — 30 seconds max wait for first response
   const controller = new AbortController();
@@ -51,14 +75,7 @@ export async function streamChatCompletion(
 
   const response = await fetch(apiUrl, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-      ...(providerId === 'openrouter' ? {
-        'HTTP-Referer': 'https://ignis-tavern.vercel.app',
-        'X-Title': 'Ignis Tavern',
-      } : {}),
-    },
+    headers,
     body: JSON.stringify({
       model: modelName,
       messages,
