@@ -6,18 +6,19 @@ type GamePhase = 'character_creation' | 'opening' | 'act1' | 'act2' | 'act3';
 /**
  * Build the GM system prompt for the web version.
  *
- * ALL prompt content is loaded from markdown files synced from src/ via sync-skill.js.
- * This file contains ZERO hardcoded prompt text — only file-reading logic and composition order.
+ * Strategy: dump ALL relevant content into one system prompt, just like the skill
+ * version does with SKILL.md. Small models need full context to avoid hallucination —
+ * cherry-picking files per phase causes more problems than it solves.
  *
- * File sources (all under web/src/data/, synced from src/):
- *   - prompts/system_{lang}.md       → base DM persona + rules (shared with skill)
- *   - prompts/dm_behavior_{lang}.md  → detailed DM behavior rules (shared with skill)
- *   - prompts/web_dm_rules_{lang}.md → web-specific rules (dice, identity, scene verbatim)
- *   - prompts/phases/{phase}_{lang}.md → phase-specific instructions
- *   - prompts/world_{lang}.md        → world setting
- *   - prompts/characters/*.md        → NPC details
- *   - rules/RULES_{lang}.md          → game rules
- *   - scenes/act*_{lang}.md          → scene scripts
+ * Prompt composition order:
+ *   1. system_{lang}.md         — DM persona + core responsibilities
+ *   2. dm_behavior_{lang}.md    — detailed behavior rules (NPC, choices, pacing, templates)
+ *   3. web_dm_rules_{lang}.md   — web-specific rules (dice, identity, scene verbatim)
+ *   4. phases/{phase}_{lang}.md — current phase instructions
+ *   5. world_{lang}.md          — world setting
+ *   6. characters/*_{lang}.md   — ALL NPC details (no spoiler gating — model needs context)
+ *   7. RULES_{lang}.md          — full game rules
+ *   8. scenes/act*_{lang}.md    — current scene script
  */
 export function buildGMPrompt(language: string, phase: GamePhase = 'character_creation'): string {
   const lang = language === 'zh' ? 'zh' : 'en';
@@ -32,13 +33,13 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
     }
   }
 
-  // 1. Base DM system prompt (shared with skill version)
+  // 1. Base DM system prompt
   const systemPrompt = readDataFile('prompts', `system_${lang}.md`);
 
-  // 2. Detailed DM behavior rules (shared with skill version)
+  // 2. Detailed DM behavior rules
   const dmBehavior = readDataFile('prompts', `dm_behavior_${lang}.md`);
 
-  // 3. Web-specific DM rules (dice, identity, scene verbatim)
+  // 3. Web-specific DM rules
   const webRules = readDataFile('prompts', `web_dm_rules_${lang}.md`);
 
   // 4. Phase-specific instructions
@@ -47,28 +48,27 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
   // 5. World setting
   const worldSetting = readDataFile('prompts', `world_${lang}.md`);
 
-  // 6. Character files (skip during creation to avoid spoilers)
+  // 6. ALL character files — include even during character creation
+  // Small models need full NPC context to not hallucinate (e.g. Licht = seal)
+  const charactersDir = path.join(dataDir, 'prompts', 'characters');
   let characterTexts = '';
-  if (phase !== 'character_creation') {
-    const charactersDir = path.join(dataDir, 'prompts', 'characters');
-    try {
-      const charFiles = fs.readdirSync(charactersDir).filter(f => f.endsWith(`_${lang}.md`));
-      for (const file of charFiles) {
-        characterTexts += '\n\n---\n\n' + fs.readFileSync(path.join(charactersDir, file), 'utf-8');
-      }
-    } catch {
-      // Characters directory might not exist
+  try {
+    const charFiles = fs.readdirSync(charactersDir).filter(f => f.endsWith(`_${lang}.md`));
+    for (const file of charFiles) {
+      characterTexts += '\n\n---\n\n' + fs.readFileSync(path.join(charactersDir, file), 'utf-8');
     }
+  } catch {
+    // Characters directory might not exist
   }
 
-  // 7. Game rules
+  // 7. Full game rules
   const rules = readDataFile('rules', `RULES_${lang}.md`);
 
-  // 8. Scene script based on phase
+  // 8. Current scene script
   let sceneText = '';
   let sceneLabel = '';
   const sceneMap: Record<GamePhase, { file: string; labelZh: string; labelEn: string }> = {
-    character_creation: { file: '', labelZh: '', labelEn: '' }, // No scene file during creation
+    character_creation: { file: '', labelZh: '', labelEn: '' },
     opening: { file: `act1_opening_${lang}.md`, labelZh: '第一幕开场', labelEn: 'Act I Opening' },
     act1: { file: `act1_tavern_management_${lang}.md`, labelZh: '第一幕酒馆经营', labelEn: 'Act I Tavern Management' },
     act2: { file: `act2_revelation_${lang}.md`, labelZh: '第二幕', labelEn: 'Act II' },
@@ -81,7 +81,7 @@ export function buildGMPrompt(language: string, phase: GamePhase = 'character_cr
     sceneLabel = lang === 'zh' ? sceneInfo.labelZh : sceneInfo.labelEn;
   }
 
-  // Compose full prompt
+  // Compose — dump everything, let the model figure it out
   const parts: string[] = [];
 
   if (systemPrompt) parts.push(systemPrompt);
