@@ -1,9 +1,10 @@
 /**
  * Multi-provider LLM configuration.
  * Each provider has its own API URL and model list.
+ * Last updated: 2026-04-20
  */
 
-export type ProviderId = 'siliconflow' | 'deepseek' | 'openai' | 'anthropic' | 'google' | 'openrouter' | 'fireworks' | 'minimax' | 'custom';
+export type ProviderId = 'openrouter' | 'siliconflow' | 'deepseek' | 'openai' | 'anthropic' | 'google' | 'fireworks' | 'minimax' | 'custom';
 
 export interface ProviderConfig {
   id: ProviderId;
@@ -17,20 +18,47 @@ export interface ProviderConfig {
 }
 
 export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
+  openrouter: {
+    id: 'openrouter',
+    name: 'OpenRouter',
+    nameZh: 'OpenRouter',
+    apiUrl: 'https://openrouter.ai/api/v1/chat/completions',
+    defaultModel: 'minimax/minimax-m2.7:free',
+    models: [
+      // Free models
+      'minimax/minimax-m2.7:free',
+      'google/gemini-2.0-flash-exp:free',
+      'meta-llama/llama-4-maverick:free',
+      // Premium models
+      'openai/gpt-5.4',
+      'openai/gpt-5.4-mini',
+      'openai/o4-mini',
+      'anthropic/claude-opus-4.7',
+      'anthropic/claude-sonnet-4-20250514',
+      'google/gemini-3-pro',
+      'google/gemini-2.5-flash-preview-05-20',
+      'deepseek/deepseek-chat-v3-0324',
+      'deepseek/deepseek-r1',
+      'z-ai/glm-5.1',
+      'moonshotai/kimi-k2.5',
+      'minimax/minimax-m2.7',
+      'qwen/qwen3-235b-a22b',
+    ],
+    apiKeyPrefix: 'sk-or-',
+    apiKeyHint: 'sk-or-...',
+  },
   siliconflow: {
     id: 'siliconflow',
     name: 'SiliconFlow',
     nameZh: '硅基流动',
     apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
-    defaultModel: 'Qwen/Qwen3.5-4B',
+    defaultModel: 'deepseek-ai/DeepSeek-V3',
     models: [
-      'Qwen/Qwen3.5-4B',
-      'Qwen/Qwen3-8B',
-      'Qwen/Qwen3-30B-A3B',
-      'Qwen/Qwen3-235B-A22B',
       'deepseek-ai/DeepSeek-V3',
       'deepseek-ai/DeepSeek-R1',
-      'THUDM/GLM-4-32B-0414',
+      'Qwen/Qwen3-235B-A22B',
+      'Qwen/Qwen3-30B-A3B',
+      'THUDM/GLM-5.1-0414',
       'Pro/deepseek-ai/DeepSeek-V3',
     ],
     apiKeyPrefix: 'sk-',
@@ -42,7 +70,7 @@ export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
     nameZh: 'DeepSeek',
     apiUrl: 'https://api.deepseek.com/v1/chat/completions',
     defaultModel: 'deepseek-chat',
-    models: ['deepseek-chat', 'deepseek-reasoner', 'deepseek-chat-v3-0324', 'deepseek-r1-distill-llama-70b'],
+    models: ['deepseek-chat', 'deepseek-reasoner'],
     apiKeyPrefix: 'sk-',
     apiKeyHint: 'sk-...',
   },
@@ -51,8 +79,8 @@ export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
     name: 'OpenAI',
     nameZh: 'OpenAI',
     apiUrl: 'https://api.openai.com/v1/chat/completions',
-    defaultModel: 'gpt-4o-mini',
-    models: ['gpt-4o', 'gpt-4o-mini', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano', 'o3', 'o3-mini', 'o4-mini'],
+    defaultModel: 'gpt-5.4-mini',
+    models: ['gpt-5.4', 'gpt-5.4-mini', 'o4-mini'],
     apiKeyPrefix: 'sk-',
     apiKeyHint: 'sk-...',
   },
@@ -61,8 +89,8 @@ export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
     name: 'Anthropic',
     nameZh: 'Anthropic',
     apiUrl: 'https://api.anthropic.com/v1/messages',
-    defaultModel: 'claude-sonnet-4-20250514',
-    models: ['claude-sonnet-4-20250514', 'claude-3-5-haiku-20241022', 'claude-opus-4-20250514', 'claude-3-5-sonnet-20241022'],
+    defaultModel: 'claude-opus-4.7',
+    models: ['claude-opus-4.7', 'claude-sonnet-4-20250514'],
     apiKeyPrefix: 'sk-ant-',
     apiKeyHint: 'sk-ant-...',
   },
@@ -71,43 +99,21 @@ export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
     name: 'Google Gemini',
     nameZh: 'Google Gemini',
     apiUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
-    defaultModel: 'gemini-2.0-flash',
-    models: ['gemini-2.5-pro-preview-05-06', 'gemini-2.5-flash-preview-05-20', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'],
+    defaultModel: 'gemini-3-pro',
+    models: ['gemini-3-pro', 'gemini-2.5-flash-preview-05-20', 'gemini-2.0-flash'],
     apiKeyPrefix: 'AI',
     apiKeyHint: 'AIza...',
-  },
-  openrouter: {
-    id: 'openrouter',
-    name: 'OpenRouter',
-    nameZh: 'OpenRouter',
-    apiUrl: 'https://openrouter.ai/api/v1/chat/completions',
-    defaultModel: 'openai/gpt-4o-mini',
-    models: [
-      'openai/gpt-4o',
-      'openai/gpt-4.1',
-      'openai/o3-mini',
-      'anthropic/claude-sonnet-4-20250514',
-      'anthropic/claude-opus-4-20250514',
-      'google/gemini-2.5-pro-preview',
-      'deepseek/deepseek-chat',
-      'deepseek/deepseek-r1',
-      'meta-llama/llama-4-maverick',
-      'qwen/qwen3-235b-a22b',
-    ],
-    apiKeyPrefix: 'sk-or-',
-    apiKeyHint: 'sk-or-...',
   },
   fireworks: {
     id: 'fireworks',
     name: 'Fireworks AI',
     nameZh: 'Fireworks AI',
     apiUrl: 'https://api.fireworks.ai/inference/v1/chat/completions',
-    defaultModel: 'accounts/fireworks/models/llama4-maverick-instruct-basic',
+    defaultModel: 'accounts/fireworks/models/qwen3-235b-a22b',
     models: [
-      'accounts/fireworks/models/llama4-maverick-instruct-basic',
-      'accounts/fireworks/models/llama-v3p3-70b-instruct',
       'accounts/fireworks/models/qwen3-235b-a22b',
       'accounts/fireworks/models/deepseek-r1',
+      'accounts/fireworks/models/llama-v3p3-70b-instruct',
     ],
     apiKeyPrefix: 'fw_',
     apiKeyHint: 'fw_...',
@@ -117,8 +123,8 @@ export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
     name: 'MiniMax',
     nameZh: 'MiniMax',
     apiUrl: 'https://api.minimax.chat/v1/text/chatcompletion_v2',
-    defaultModel: 'MiniMax-Text-01',
-    models: ['MiniMax-Text-01', 'MiniMax-M1', 'abab6.5s-chat'],
+    defaultModel: 'MiniMax-M2.7',
+    models: ['MiniMax-M2.7', 'MiniMax-M1', 'MiniMax-Text-01'],
     apiKeyPrefix: '',
     apiKeyHint: 'MM API Key',
   },
@@ -142,8 +148,7 @@ export function detectProvider(apiKey: string): ProviderId {
   if (apiKey.startsWith('sk-ant-')) return 'anthropic';
   if (apiKey.startsWith('fw_')) return 'fireworks';
   if (apiKey.startsWith('AIza')) return 'google';
-  // DeepSeek and OpenAI both start with sk-, check length/pattern heuristics
   if (apiKey.startsWith('sk-') && apiKey.length < 40) return 'deepseek';
   if (apiKey.startsWith('sk-')) return 'openai';
-  return 'siliconflow'; // fallback
+  return 'openrouter';
 }

@@ -21,14 +21,14 @@ interface ApiKeyModalProps {
 const FALLBACK_INFO = {
   zh: {
     provider: 'OpenRouter',
-    model: 'MiniMax-M2.5 (Free)',
+    model: 'MiniMax-M2.7 (Free)',
     desc: '免费模型，适合体验游戏流程',
     speed: '~3-8 秒/回复',
     quality: '⭐⭐⭐',
   },
   en: {
     provider: 'OpenRouter',
-    model: 'MiniMax-M2.5 (Free)',
+    model: 'MiniMax-M2.7 (Free)',
     desc: 'Free model, good for trying the game flow',
     speed: '~3-8 sec/response',
     quality: '⭐⭐⭐',
@@ -113,7 +113,7 @@ export default function ApiKeyModal({
       modeDefaultDesc: '使用免费保底模型，无需配置',
       modeCustom: '自定义模式',
       modeCustomDesc: '使用自己的 API Key，体验更佳',
-      defaultBanner: '⚠️ 默认模式使用免费模型（MiniMax-M2.5），可能会出现角色设定偏差或叙事不稳定。强烈建议切换到自定义模式，使用更强的模型（如 DeepSeek-V3、GPT-4o 等）以获得最佳体验！',
+      defaultBanner: '⚠️ 默认模式使用免费模型（MiniMax-M2.7），可能会出现角色设定偏差或叙事不稳定。强烈建议切换到自定义模式，使用更强的模型（如 GPT-5.4、Claude Opus 4.7、Gemini 3 Pro、DeepSeek-V3 等）以获得最佳体验！',
       fallbackInfo: '保底模型信息',
       fallbackProvider: '提供商',
       fallbackModel: '模型',
@@ -140,7 +140,7 @@ export default function ApiKeyModal({
       modeDefaultDesc: 'Use free fallback model, no setup needed',
       modeCustom: 'Custom',
       modeCustomDesc: 'Use your own API key for better experience',
-      defaultBanner: '⚠️ Default mode uses a free model (MiniMax-M2.5) which may produce inaccurate character settings or unstable narratives. Strongly recommend switching to Custom mode with a stronger model (e.g. DeepSeek-V3, GPT-4o) for the best experience!',
+      defaultBanner: '⚠️ Default mode uses a free model (MiniMax-M2.7) which may produce inaccurate character settings or unstable narratives. Strongly recommend switching to Custom mode with a stronger model (e.g. GPT-5.4, Claude Opus 4.7, Gemini 3 Pro, DeepSeek-V3) for the best experience!',
       fallbackInfo: 'Fallback Model Info',
       fallbackProvider: 'Provider',
       fallbackModel: 'Model',
@@ -378,7 +378,7 @@ export default function ApiKeyModal({
               onSave?.({
                 apiKey: mode === 'custom' ? apiKey.trim() : '',
                 provider: mode === 'custom' ? providerId : 'openrouter',
-                model: mode === 'custom' ? (model.trim() || provider.defaultModel) : 'minimax/minimax-m2.5:free',
+                model: mode === 'custom' ? (model.trim() || provider.defaultModel) : 'minimax/minimax-m2.7:free',
                 customApiUrl: mode === 'custom' ? customApiUrl.trim() : '',
                 mode,
               });
