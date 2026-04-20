@@ -3,7 +3,7 @@
  * Each provider has its own API URL and model list.
  */
 
-export type ProviderId = 'deepseek' | 'openai' | 'anthropic' | 'google' | 'openrouter' | 'fireworks' | 'minimax' | 'custom';
+export type ProviderId = 'siliconflow' | 'deepseek' | 'openai' | 'anthropic' | 'google' | 'openrouter' | 'fireworks' | 'minimax' | 'custom';
 
 export interface ProviderConfig {
   id: ProviderId;
@@ -17,6 +17,25 @@ export interface ProviderConfig {
 }
 
 export const PROVIDERS: Record<ProviderId, ProviderConfig> = {
+  siliconflow: {
+    id: 'siliconflow',
+    name: 'SiliconFlow',
+    nameZh: '硅基流动',
+    apiUrl: 'https://api.siliconflow.cn/v1/chat/completions',
+    defaultModel: 'Qwen/Qwen3.5-4B',
+    models: [
+      'Qwen/Qwen3.5-4B',
+      'Qwen/Qwen3-235B-A22B',
+      'Qwen/Qwen3-30B-A3B',
+      'Qwen/Qwen3-8B',
+      'deepseek-ai/DeepSeek-V3',
+      'deepseek-ai/DeepSeek-R1',
+      'THUDM/GLM-4-32B-0414',
+      'Pro/deepseek-ai/DeepSeek-V3',
+    ],
+    apiKeyPrefix: 'sk-',
+    apiKeyHint: 'sk-...',
+  },
   deepseek: {
     id: 'deepseek',
     name: 'DeepSeek',
@@ -124,8 +143,7 @@ export function detectProvider(apiKey: string): ProviderId {
   if (apiKey.startsWith('fw_')) return 'fireworks';
   if (apiKey.startsWith('AIza')) return 'google';
   // DeepSeek and OpenAI both start with sk-, check length/pattern heuristics
-  // DeepSeek keys are typically shorter
   if (apiKey.startsWith('sk-') && apiKey.length < 40) return 'deepseek';
   if (apiKey.startsWith('sk-')) return 'openai';
-  return 'deepseek'; // fallback
+  return 'siliconflow'; // fallback
 }

@@ -21,6 +21,8 @@ export async function POST(request: NextRequest) {
 
     // This endpoint only handles fallback — no user key accepted
     const apiKey = process.env.FALLBACK_API_KEY;
+    const fallbackProvider = (process.env.FALLBACK_PROVIDER as ProviderId) || 'siliconflow';
+    const fallbackModel = process.env.FALLBACK_MODEL || 'Qwen/Qwen3.5-4B';
     if (!apiKey) {
       return NextResponse.json(
         { error: 'No fallback API key configured on server. Please provide your own API key.' },
@@ -44,8 +46,8 @@ export async function POST(request: NextRequest) {
             {
               apiKey,
               messages: llmMessages,
-              model: model || undefined,
-              provider: (provider as ProviderId) || undefined,
+              model: fallbackModel,
+              provider: fallbackProvider,
             },
             (chunk) => {
               controller.enqueue(
