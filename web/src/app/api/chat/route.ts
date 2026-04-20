@@ -63,12 +63,26 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Build system prompt
-    const systemPrompt = buildGMPrompt(language || 'zh', (phase || 'character_creation') as any);
-    const llmMessages = [
+    // Build system prompt (progressive loading — only includes files relevant to current phase)
+    const currentPhase = (phase || 'character_creation') as any;
+    const systemPrompt = buildGMPrompt(language || 'zh', currentPhase);
+
+    // For the opening phase, inject a scene-trigger user message if this is the first turn
+    // after character creation. This gives the model a clear signal to narrate the opening scene.
+    const lang = language === 'zh' ? 'zh' : 'en';
+    let llmMessages: { role: string; content: string }[] = [
       { role: 'system', content: systemPrompt },
-      ...messages,
     ];
+
+    if (currentPhase === 'opening' && messages.length <= 2) {
+      // First turn in opening phase — inject scene trigger
+      const trigger = lang === 'zh'
+        ? '角色已创建完成。请按照场景文件原文，开始第一幕开场叙事。'
+        : 'Character creation is complete. Begin the Act I opening scene, using the scene file text verbatim.';
+      llmMessages.push({ role: 'user', content: trigger });
+    } else {
+      llmMessages.push(...messages);
+    }
 
     // Determine provider attempts
     const attempts: { apiKey: string; provider: string; model: string; customApiUrl?: string }[] = [];

@@ -190,8 +190,6 @@ function GamePageContent() {
       // Check for phase transition in character creation response
       const charPhaseMatch = fullResponse.match(/\[PHASE_TRANSITION:(\w+)\]/);
       if (charPhaseMatch) {
-        const charClean = fullResponse.replace(/\[PHASE_TRANSITION:\w+\]/g, '').trim();
-        dispatch({ type: 'FINISH_STREAMING', payload: charClean });
         if (charPhaseMatch[1] === 'opening') {
           setTimeout(() => {
             dispatch({ type: 'SET_SCENE', payload: 'opening' });
@@ -261,10 +259,13 @@ function GamePageContent() {
           dispatch({ type: 'APPEND_STREAMING_TEXT', payload: chunk });
         }
 
-        dispatch({ type: 'FINISH_STREAMING', payload: fullResponse });
+        // Strip PHASE_TRANSITION markers before displaying
+        const phaseMatch = fullResponse.match(/\[PHASE_TRANSITION:(\w+)\]/);
+        const cleanResponse = fullResponse.replace(/\[PHASE_TRANSITION:\w+\]/g, '').trim();
+
+        dispatch({ type: 'FINISH_STREAMING', payload: cleanResponse });
 
         // Check if the response contains a dice check request
-        // Support both Chinese and English patterns
         const dicePatterns = [
           /🎲\s*检定[：:]\s*(\S+)\s*DC\s*(\d+)/i,
           /🎲\s*Check[：:]\s*(\S+)\s*DC\s*(\d+)/i,
@@ -279,7 +280,6 @@ function GamePageContent() {
           const match = fullResponse.match(pattern);
           if (match) {
             detectedDC = parseInt(match[2] || match[1]);
-            // If the pattern captures a label (e.g. "体魄", "STR"), use it
             if (match.length >= 3 && match[1] && !/^\d+$/.test(match[1])) {
               detectedLabel = match[1];
             }
@@ -293,15 +293,9 @@ function GamePageContent() {
           setDiceCheckLabel(detectedLabel);
         }
 
-        // Check for phase transition marker
-        const phaseMatch = fullResponse.match(/\[PHASE_TRANSITION:(\w+)\]/);
+        // Handle phase transition
         if (phaseMatch) {
           const nextPhase = phaseMatch[1];
-          // Strip the marker from displayed text
-          const cleanResponse = fullResponse.replace(/\[PHASE_TRANSITION:\w+\]/g, '').trim();
-          dispatch({ type: 'FINISH_STREAMING', payload: cleanResponse });
-
-          // Map phase names to game phases
           const phaseMap: Record<string, string> = {
             'opening': 'opening',
             'act1': 'act1',
@@ -310,7 +304,6 @@ function GamePageContent() {
             'ending': 'ending',
           };
           if (phaseMap[nextPhase]) {
-            // Delay phase transition slightly so player can see the current response
             setTimeout(() => {
               dispatch({ type: 'SET_SCENE', payload: phaseMap[nextPhase] });
               if (nextPhase === 'opening') dispatch({ type: 'SET_ACT', payload: 1 });
@@ -322,9 +315,8 @@ function GamePageContent() {
         }
 
         // Parse character data from DM response
-        if (gameState.currentScene === 'character_creation') {
-          parseCharacterFromResponse(fullResponse, dispatch, lang);
-        }
+        // Always try to parse — the function only acts if it finds character data
+        parseCharacterFromResponse(fullResponse, dispatch, lang);
       } catch (error: any) {
         let errMsg = error.message || 'Unknown error';
         if (errMsg.includes('daily_limit')) {
@@ -353,7 +345,7 @@ function GamePageContent() {
         dispatch({ type: 'FINISH_STREAMING', payload: fullResponse || errMsg });
       }
     },
-    [gameState.messages, gameState.isStreaming, gameState.language, gameState.userApiKey]
+    [gameState.messages, gameState.isStreaming, gameState.language, gameState.userApiKey, gameState.currentScene]
   );
 
   const handleDiceRoll = useCallback(
