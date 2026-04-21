@@ -174,17 +174,26 @@ But Goddess is forever gone.
 
 **Final Check Battle**:
 
-**Round 1**: Will DC 16 (resist abyss erosion)
-- **Success**: Stay conscious, continue ritual
-- **Failure**: Someone temporarily失控, needs rescue
+**Round 1: Will Check**
 
-**Round 2**: Coordination DC 18 (three-person sync)
-- **Success**: Trinity resonance successful
-- **Failure**: Need extra round to adjust
+Abyss whispers erode your mind. Faces of the dead appear in the rift.
 
-**Round 3**: Final burst DC 20 (or any attribute max)
-- **Success**: Perfect ending achieved
-- **Failure**: Convert to normal good ending
+**[1]** Push through, stay conscious — **WILL DC> 16 (+INT)**
+**[2]** Give up, let the abyss take you
+
+**Round 2: Coordination**
+
+You need the three of you in perfect sync.
+
+**[1]** Call out to Yu, Huan, Licht — time it together — **COORDINATION DC> 18 (+CHA)**
+**[2]** Hesitate, lose the moment
+
+**Round 3: Final Burst**
+
+Last chance. Everything rides on this.
+
+**[1]** Pour everything into the trinity ritual — **FINAL DC> 20 (+max stat)**
+**[2]** Hold back, afraid to fail
 
 **Ending Scene**:
 
