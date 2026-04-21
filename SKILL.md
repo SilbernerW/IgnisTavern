@@ -26,6 +26,9 @@ Display this when a new session begins:
   🔥 伊格尼斯酒馆 / Ignis Tavern 🔥
 ================================
 
+  An AI-powered tabletop RPG experience set in the culinary metropolis of Ignis.
+  一款以美食之城伊格尼斯为背景的 AI 驱动桌面角色扮演游戏。
+
   请选择语言 / Please select language:
 
   [1] 中文
@@ -220,6 +223,16 @@ Briefly confirm the character's name and template/attributes. Keep backstory vag
 **File**: `src/scenes/act1_opening_zh.md` (or `*_en.md`)
 
 **After reading the scene narrative aloud**: Present a options menu (2-3 directional choices) per Rule 12. Do not end with a bare "What do you do?" — always give concrete options that move the story forward.
+
+**DC Notation on Options**: When presenting options that will require a dice check, format as: `[Option number] Description — STAT DC> [number]`. Show the player's current stat modifier in parentheses nearby.
+
+Example (Mediator: STR 12(+1) DEX 10(+0) INT 14(+2) CHA 10(+0)):
+- **[1] Inspect the kitchen for supplies — INT DC> 12 (+2)**
+- **[2] Persuade the merchant for a discount — CHA DC> 14 (+0)**
+- **[3] Sneak into the back room — DEX DC> 10 (+0)**
+- **[4] Break down the stuck door — STR DC> 10 (+1)**
+
+Options without rolls omit the DC entirely.
 
 **Key Design Change**: All three characters are already present when the player arrives at the tavern. They are not waiting to be recruited; they are on "probation," deciding whether the new boss is worth staying for. **Do not say their names until they introduce themselves in-character.**
 
